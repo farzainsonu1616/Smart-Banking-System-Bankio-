@@ -1,0 +1,24 @@
+query GetUserCommissions @auth(level: USER) {
+  commissions(where: {user: {id: {eq_expr: "auth.uid"}}}) {
+    amount
+    status
+    periodEndDate
+  }
+}
+
+mutation CreateVolumeLog($amount: Float!, $side: String!) @auth(level: USER) {
+  volumeLog_insert(data: {
+    userId_expr: "auth.uid",
+    amount: $amount,
+    side: $side,
+    createdAt_expr: "request.time"
+  })
+}
+
+mutation UpdateCommissionStatus($id: UUID!, $status: String!) @auth(expr: "auth.token.admin == true") {
+  commission_update(key: {id: $id}, data: {status: $status})
+}
+
+mutation DeleteSystemConfig($id: UUID!) @auth(expr: "auth.token.admin == true") {
+  systemConfig_delete(key: {id: $id})
+}

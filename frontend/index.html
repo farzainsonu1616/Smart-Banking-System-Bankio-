@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/assets/images/fav.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Smart Banking System - Secure, Modern, and Reliable Digital Banking Solutions" />
+    <title>Smart Banking System</title>
+    <script>
+      // Workaround for Blackbox Chrome Extension CORS/404 errors
+      const originalFetch = window.fetch;
+      window.fetch = async function(...args) {
+        let url = '';
+        if (typeof args[0] === 'string') {
+          url = args[0];
+        } else if (args[0] && args[0].url) {
+          url = args[0].url;
+        }
+        if (url && url.includes('useblackbox.io')) {
+          return new Response(JSON.stringify({}), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }
+        return originalFetch.apply(this, args);
+      };
+
+      // Suppress the "Uncaught (in promise) TypeError: Failed to fetch" from the extension
+      window.addEventListener('unhandledrejection', function(event) {
+        if (event.reason && event.reason.message === 'Failed to fetch') {
+          const stack = event.reason.stack || '';
+          if (stack.includes('index.iife.js') || stack.includes('useblackbox.io')) {
+            event.preventDefault();
+          }
+        }
+      });
+      
+      // Also intercept console.error for this specific error just in case
+      const originalConsoleError = console.error;
+      console.error = function(...args) {
+        if (typeof args[0] === 'string' && args[0].includes('useblackbox.io')) {
+          return;
+        }
+        return originalConsoleError.apply(console, args);
+      };
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

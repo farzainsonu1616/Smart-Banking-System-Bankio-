@@ -1,0 +1,34 @@
+type User @table {
+  email: String!
+  fullName: String!
+  placementSide: String!
+  rank: String!
+  phoneNumber: String
+  sponsor: User
+}
+
+type NodePlacement @table {
+  user: User!
+  parent: User!
+  position: String!
+}
+
+type VolumeLog @table {
+  user: User!
+  amount: Float!
+  side: String!
+  createdAt: Timestamp!
+}
+
+type Commission @table {
+  user: User!
+  amount: Float!
+  status: String!
+  periodEndDate: Date!
+}
+
+type SystemConfig @table {
+  configKey: String!
+  value: String!
+  description: String
+}

@@ -1,0 +1,2 @@
+-- Seed data removed to prevent startup crash due to schema mismatch.
+-- Static Admin user is now seeded via CommandLineRunner.
