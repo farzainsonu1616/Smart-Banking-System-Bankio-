@@ -9,7 +9,7 @@ const SuperAdminSettings = () => {
         <button className="btn btn-primary d-flex align-items-center gap-2"><FiSave /> Save Changes</button>
       </div>
 
-      <div className="card border-0 shadow-sm rounded-4 p-4">
+      <div className="card border-0 shadow-sm rounded-4 p-4 hover-lift" style={{ background: 'var(--secondary)' }}>
         <div className="row gy-4">
           <div className="col-md-6">
             <div className="form-group">

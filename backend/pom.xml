@@ -59,6 +59,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- H2 Database (In-Memory) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- JWT Dependencies -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -126,3 +133,4 @@
     </plugins>
 </build>
 </project>
+<!-- trigger reload -->

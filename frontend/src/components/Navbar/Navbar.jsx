@@ -15,10 +15,24 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
   return (
-    <header className={`header-section ${scrolled ? 'header-fixed' : ''}`}>
-      <div className="container">
+    <>
+      <div className={`top-task-bar d-none d-lg-block ${scrolled ? 'd-none' : ''}`} style={{ background: 'var(--primary)', color: 'white', padding: '8px 0', fontSize: '13px', zIndex: 1000, position: 'fixed', width: '100%', top: 0, borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
+        <div className="container d-flex justify-content-between align-items-center">
+          <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', width: '70%', border: '1px solid rgba(255,255,255,0.3)', padding: '2px 10px', borderRadius: '4px' }}>
+             <marquee scrollamount="5" className="fw-medium m-0">
+               🚀 Welcome to Bankio - The Next Generation Smart Banking System. Experience Zero-Fee International Transfers, High-Yield Savings, and 24/7 Security Monitoring. Join us today and secure your financial future! 🔒
+             </marquee>
+          </div>
+          <div className="d-flex gap-3 fw-bold">
+             <span>📞 1-800-BANKIO</span>
+             <span>✉️ hello@bankio.com</span>
+          </div>
+        </div>
+      </div>
+
+      <header className={`header-section ${scrolled ? 'header-fixed' : ''}`} style={{ top: scrolled ? '0' : '40px', transition: 'all 0.3s' }}>
+        <div className="container">
         <nav className="navbar navbar-expand-lg">
           <button className="navbar-toggler border-0 order-0" onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <FiX size={24} /> : <FiMenu size={24} />}
@@ -77,7 +91,7 @@ const Navbar = () => {
                 </Link>
               ) : (
                 <>
-                  <Link to="/login" className="fw-semibold text-gradient hover-lift me-2">Sign In</Link>
+                  <Link to="/login" className="cmn-btn second shadow-sm hover-lift me-2" style={{ borderRadius: '12px', padding: '10px 24px' }}>Sign In</Link>
                   <Link to="/register" className="cmn-btn shadow-sm hover-lift" style={{ borderRadius: '12px', padding: '10px 24px' }}>Sign Up</Link>
                 </>
               )}
@@ -85,7 +99,8 @@ const Navbar = () => {
           </div>
         </nav>
       </div>
-    </header>
+      </header>
+    </>
   )
 }
 

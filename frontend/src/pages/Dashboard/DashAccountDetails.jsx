@@ -1,34 +1,49 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { FiArrowLeft, FiCopy, FiCheckCircle, FiInfo, FiActivity } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import { formatCurrency } from '../../utils/Helpers'
 import Preloader from '../../components/Common/Preloader'
+import AccountService from '../../services/AccountService'
 
 const DashAccountDetails = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
-
-  // Realistic mock data
-  const accountData = {
-    accountNumber: 'XXXX-XXXX-4589',
-    ifsc: 'BNKO0001234',
-    branch: 'Main Branch, Mumbai',
-    accountType: 'Premium Savings',
-    balance: 450000,
-    status: 'ACTIVE',
-    openedDate: '2022-04-15',
-    currency: 'INR',
-    interestRate: '4.5%',
-    dailyLimit: 100000
-  }
+  const [accountData, setAccountData] = useState(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 500)
-    return () => clearTimeout(timer)
+    fetchAccountData()
   }, [])
+
+  const fetchAccountData = async () => {
+    try {
+      setLoading(true)
+      let account;
+      // If navigated with state, use that ID, else fetch all and use first
+      if (location.state?.accountId) {
+        const res = await AccountService.getAccountById(location.state.accountId)
+        account = res.data.data
+      } else {
+        const res = await AccountService.getAccounts()
+        if (res.data.data && res.data.data.length > 0) {
+          account = res.data.data[0]
+        } else {
+          toast.error('No accounts found')
+          navigate('/customer/dashboard')
+          return
+        }
+      }
+      
+      setAccountData(account)
+    } catch (error) {
+      toast.error('Failed to load account details')
+      navigate('/customer/dashboard')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
@@ -37,12 +52,12 @@ const DashAccountDetails = () => {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (loading) return <Preloader />
+  if (loading || !accountData) return <Preloader />
 
   return (
     <div className="container-fluid py-4">
       <div className="d-flex align-items-center mb-4 gap-3">
-        <Link to="/customer/dashboard" className="btn btn-outline-light text-dark rounded-circle d-flex align-items-center justify-content-center p-0" style={{ width: '40px', height: '40px' }}>
+        <Link to="/customer/accounts" className="btn btn-outline-light text-dark rounded-circle d-flex align-items-center justify-content-center p-0" style={{ width: '40px', height: '40px' }}>
           <FiArrowLeft size={20} />
         </Link>
         <h2 className="mb-0">Account Details</h2>
@@ -60,7 +75,7 @@ const DashAccountDetails = () => {
                 <div className="d-flex align-items-center gap-3 mt-2">
                   <h3 className="mb-0 letter-spacing-2 font-monospace">{accountData.accountNumber}</h3>
                   <button 
-                    onClick={() => copyToClipboard('987654324589')} 
+                    onClick={() => copyToClipboard(accountData.accountNumber)} 
                     className="btn btn-sm btn-light border"
                     title="Copy Account Number"
                   >
@@ -83,37 +98,37 @@ const DashAccountDetails = () => {
               <div className="col-sm-6 col-md-4">
                 <div className="p-3 bg-light rounded-3">
                   <p className="text-muted small mb-1">Available Balance</p>
-                  <h4 className="text-primary mb-0">{formatCurrency(accountData.balance, accountData.currency)}</h4>
+                  <h4 className="text-primary mb-0">{formatCurrency(accountData.balance, accountData.currency || 'INR')}</h4>
                 </div>
               </div>
               <div className="col-sm-6 col-md-4">
                 <div className="p-3 bg-light rounded-3">
                   <p className="text-muted small mb-1">Branch Name</p>
-                  <h5 className="mb-0 text-dark">{accountData.branch}</h5>
+                  <h5 className="mb-0 text-dark">Main Branch</h5>
                 </div>
               </div>
               <div className="col-sm-6 col-md-4">
                 <div className="p-3 bg-light rounded-3">
                   <p className="text-muted small mb-1">IFSC Code</p>
-                  <h5 className="mb-0 text-dark">{accountData.ifsc}</h5>
+                  <h5 className="mb-0 text-dark">{accountData.ifscCode || 'BNKO0001234'}</h5>
                 </div>
               </div>
               <div className="col-sm-6 col-md-4">
                 <div className="p-3 bg-light rounded-3">
                   <p className="text-muted small mb-1">Interest Rate</p>
-                  <h5 className="mb-0 text-dark">{accountData.interestRate} p.a.</h5>
+                  <h5 className="mb-0 text-dark">4.5% p.a.</h5>
                 </div>
               </div>
               <div className="col-sm-6 col-md-4">
                 <div className="p-3 bg-light rounded-3">
                   <p className="text-muted small mb-1">Daily Transfer Limit</p>
-                  <h5 className="mb-0 text-dark">{formatCurrency(accountData.dailyLimit, accountData.currency)}</h5>
+                  <h5 className="mb-0 text-dark">{formatCurrency(100000, accountData.currency || 'INR')}</h5>
                 </div>
               </div>
               <div className="col-sm-6 col-md-4">
                 <div className="p-3 bg-light rounded-3">
                   <p className="text-muted small mb-1">Account Opened</p>
-                  <h5 className="mb-0 text-dark">{new Date(accountData.openedDate).toLocaleDateString()}</h5>
+                  <h5 className="mb-0 text-dark">{new Date(accountData.createdAt).toLocaleDateString()}</h5>
                 </div>
               </div>
             </div>

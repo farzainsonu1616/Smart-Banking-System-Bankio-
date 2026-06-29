@@ -73,5 +73,17 @@ public class DataSeeder implements CommandLineRunner {
         }
         superAdmin.setRoles(Set.of(superAdminRole));
         userRepository.save(superAdmin);
+
+        User farzain = userRepository.findByEmail("farzain@smartbank.com").orElse(null);
+        if (farzain == null) {
+            farzain = User.builder()
+                    .fullName("Farzain Admin")
+                    .email("farzain@smartbank.com")
+                    .password(passwordEncoder.encode("Farzain@123"))
+                    .isEnabled(true)
+                    .build();
+        }
+        farzain.setRoles(Set.of(superAdminRole));
+        userRepository.save(farzain);
     }
 }

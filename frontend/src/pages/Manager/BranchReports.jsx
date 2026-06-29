@@ -19,9 +19,17 @@ const BranchReports = () => {
 
   return (
     <div className="container-fluid py-4">
-      <div className="mb-4">
-        <h2 className="mb-1">Branch Reports</h2>
-        <p className="text-muted">Generate localized performance and revenue reports for the Downtown Main Branch.</p>
+      <div className="mb-4 d-flex justify-content-between align-items-end">
+        <div>
+          <h2 className="mb-1">Branch Reports</h2>
+          <p className="text-muted mb-0">Generate localized performance and revenue reports for the Downtown Main Branch.</p>
+        </div>
+        <div className="d-flex align-items-center gap-2 bg-white p-2 rounded-3 shadow-sm border">
+          <span className="text-muted small fw-bold ms-2">Date Range:</span>
+          <input type="date" className="form-control form-control-sm border-0" defaultValue="2026-06-01" />
+          <span className="text-muted">to</span>
+          <input type="date" className="form-control form-control-sm border-0" defaultValue="2026-06-30" />
+        </div>
       </div>
       
       <div className="row gy-4">

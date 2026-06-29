@@ -27,6 +27,7 @@ public class UserDashboardServiceImpl implements UserDashboardService {
     private final TransactionRepository transactionRepository;
 
     @Override
+    @SuppressWarnings("null")
     public DashboardSummaryDTO getSummary(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -77,6 +78,7 @@ public class UserDashboardServiceImpl implements UserDashboardService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public DashboardChartDTO getChartData(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));

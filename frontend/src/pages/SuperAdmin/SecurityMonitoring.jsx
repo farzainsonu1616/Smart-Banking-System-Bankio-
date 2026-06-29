@@ -27,9 +27,9 @@ const SecurityMonitoring = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-4 shadow-sm p-4">
+      <div className="rounded-4 shadow-sm p-4 hover-lift" style={{ background: 'var(--secondary)' }}>
         <h5 className="mb-4 text-dark fw-bold">Live Security Feed</h5>
-        <div className="table-responsive">
+        <div className="table-responsive border-0">
           <table className="table table-hover align-middle mb-0">
             <thead className="table-light">
               <tr>

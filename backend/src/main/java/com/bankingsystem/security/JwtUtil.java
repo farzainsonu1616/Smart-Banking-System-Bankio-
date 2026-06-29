@@ -53,6 +53,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    @SuppressWarnings("null")
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -67,6 +68,7 @@ public class JwtUtil {
         return claims.get("role", String.class);
     }
 
+    @SuppressWarnings("null")
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }

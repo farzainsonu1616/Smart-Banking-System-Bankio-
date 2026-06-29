@@ -14,13 +14,6 @@ const DashCardList = () => {
   const [selectedCardId, setSelectedCardId] = useState(null)
   const [pinInput, setPinInput] = useState('')
 
-  // Realistic mock data if backend falls short for demonstration
-  const mockCards = [
-    { id: 'C1001', cardType: 'CREDIT', cardNumber: '4532112233445566', cardHolderName: 'JOHN DOE', expiryDate: '12/28', status: 'ACTIVE', creditLimit: 500000, availableBalance: 125000 },
-    { id: 'C1002', cardType: 'DEBIT', cardNumber: '5522334411229988', cardHolderName: 'JOHN DOE', expiryDate: '09/27', status: 'ACTIVE' },
-    { id: 'C1003', cardType: 'DEBIT', cardNumber: '4532001122334455', cardHolderName: 'JOHN DOE', expiryDate: '05/25', status: 'BLOCKED' },
-  ]
-
   useEffect(() => {
     fetchCards()
   }, [])
@@ -28,13 +21,14 @@ const DashCardList = () => {
   const fetchCards = async () => {
     try {
       const res = await CardService.getCards()
-      if (res.data && res.data.data && res.data.data.length > 0) {
+      if (res.data && res.data.data) {
         setCards(res.data.data)
       } else {
-        setCards(mockCards)
+        setCards([])
       }
     } catch (error) {
-      setCards(mockCards)
+      toast.error('Failed to fetch cards')
+      setCards([])
     } finally {
       setLoading(false)
     }
@@ -43,9 +37,11 @@ const DashCardList = () => {
   const handleToggleCardStatus = async (id, currentStatus) => {
     try {
       if (currentStatus === 'ACTIVE') {
+        await CardService.updateCardStatus(id, 'BLOCKED')
         setCards(cards.map(c => c.id === id ? { ...c, status: 'BLOCKED' } : c))
         toast.success('Card blocked successfully for your security.')
       } else if (currentStatus === 'BLOCKED') {
+        await CardService.updateCardStatus(id, 'ACTIVE')
         setCards(cards.map(c => c.id === id ? { ...c, status: 'ACTIVE' } : c))
         toast.success('Card activated successfully.')
       }

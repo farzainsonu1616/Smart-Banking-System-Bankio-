@@ -11,7 +11,7 @@ const SuperAdminProfile = () => {
 
       <div className="row gy-4">
         <div className="col-xl-4">
-          <div className="card border-0 shadow-sm rounded-4 text-center p-4">
+          <div className="card border-0 shadow-sm rounded-4 text-center p-4 hover-lift" style={{ background: 'var(--secondary)' }}>
             <img src="https://ui-avatars.com/api/?name=Super+Admin&background=random" alt="Admin" className="rounded-circle mx-auto mb-3" width="120" height="120" />
             <h4 className="fw-bold text-dark mb-1">System Administrator</h4>
             <span className="badge bg-danger-subtle text-danger mb-3"><FiShield className="me-1" /> Super Admin Level 1</span>
@@ -19,7 +19,7 @@ const SuperAdminProfile = () => {
           </div>
         </div>
         <div className="col-xl-8">
-          <div className="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <div className="card border-0 shadow-sm rounded-4 p-4 h-100 hover-lift" style={{ background: 'var(--secondary)' }}>
             <h5 className="fw-bold text-dark mb-4">Personal Information</h5>
             <div className="row gy-4">
               <div className="col-md-6">

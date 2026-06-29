@@ -258,8 +258,50 @@ public class AuthController {
                 .email(dbUser.getEmail())
                 .phone(dbUser.getMobile())
                 .roles(dbUser.getRoles().stream().map(r -> "ROLE_" + r.getName()).reduce((a, b) -> a + "," + b).orElse(""))
+                .isActive(dbUser.isEnabled())
                 .build();
                 
         return ResponseEntity.ok(ApiResponse.success("User profile fetched", userDTO));
+    }
+
+    @PutMapping("/update-profile")
+    public ResponseEntity<ApiResponse<UserDTO>> updateProfile(@RequestBody Map<String, String> request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Not authenticated"));
+        }
+        
+        String email = authentication.getName();
+        User dbUser = userRepository.findByEmail(email).orElse(null);
+        if (dbUser == null) {
+            return ResponseEntity.status(404).body(ApiResponse.error("User not found"));
+        }
+        
+        if (request.containsKey("firstName") || request.containsKey("lastName")) {
+            String firstName = request.getOrDefault("firstName", "");
+            String lastName = request.getOrDefault("lastName", "");
+            dbUser.setFullName((firstName + " " + lastName).trim());
+        }
+        if (request.containsKey("phone")) {
+            dbUser.setMobile(request.get("phone"));
+        }
+        if (request.containsKey("address")) {
+            dbUser.setAddress(request.get("address"));
+        }
+        
+        userRepository.save(dbUser);
+        
+        String[] nameParts = dbUser.getFullName() != null ? dbUser.getFullName().split(" ", 2) : new String[]{"", ""};
+        UserDTO userDTO = UserDTO.builder()
+                .id(dbUser.getId())
+                .firstName(nameParts[0])
+                .lastName(nameParts.length > 1 ? nameParts[1] : "")
+                .email(dbUser.getEmail())
+                .phone(dbUser.getMobile())
+                .roles(dbUser.getRoles().stream().map(r -> "ROLE_" + r.getName()).reduce((a, b) -> a + "," + b).orElse(""))
+                .isActive(dbUser.isEnabled())
+                .build();
+                
+        return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", userDTO));
     }
 }

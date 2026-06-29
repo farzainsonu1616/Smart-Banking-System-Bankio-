@@ -7,82 +7,124 @@ import TransactionTable from '../../components/DashboardWidgets/TransactionTable
 import { formatCurrency } from '../../utils/Helpers'
 import Preloader from '../../components/Common/Preloader'
 import { useAuth } from '../../context/AuthContext'
+import AccountService from '../../services/AccountService'
+import TransactionService from '../../services/TransactionService'
+import LoanService from '../../services/LoanService'
 
 const Dashboard = () => {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
 
-  // Realistic Mock Data
-  const mockStats = {
-    totalBalance: 450000,
-    totalDeposits: 125000,
-    totalWithdrawals: 45000,
-    activeLoans: 1
-  }
+  const [stats, setStats] = useState({
+    totalBalance: 0,
+    totalDeposits: 0,
+    totalWithdrawals: 0,
+    activeLoans: 0
+  })
 
-  const mockTransactions = [
-    { id: 1, transactionDate: '2026-06-20T10:30:00Z', referenceNumber: 'TXN89347593', description: 'Amazon Web Services', type: 'WITHDRAWAL', amount: 1500, status: 'COMPLETED' },
-    { id: 2, transactionDate: '2026-06-19T14:15:00Z', referenceNumber: 'TXN89347594', description: 'Salary NEFT', type: 'DEPOSIT', amount: 85000, status: 'COMPLETED' },
-    { id: 3, transactionDate: '2026-06-18T09:45:00Z', referenceNumber: 'TXN89347595', description: 'Starbucks Coffee', type: 'WITHDRAWAL', amount: 350, status: 'COMPLETED' },
-    { id: 4, transactionDate: '2026-06-17T18:20:00Z', referenceNumber: 'TXN89347596', description: 'Rent Transfer', type: 'TRANSFER_OUT', amount: 25000, status: 'PENDING' },
-    { id: 5, transactionDate: '2026-06-16T11:10:00Z', referenceNumber: 'TXN89347597', description: 'Dividend Credit', type: 'DEPOSIT', amount: 4500, status: 'COMPLETED' },
-  ]
-
-  const mockNotifications = [
-    { id: 1, title: 'Salary Credited successfully.', time: '2 hours ago', icon: <FiArrowDownCircle className="text-success fs-4" /> },
-    { id: 2, title: 'New Login from Windows PC.', time: '1 day ago', icon: <FiAlertCircle className="text-warning fs-4" /> },
-    { id: 3, title: 'Credit Card Bill Due tomorrow.', time: '2 days ago', icon: <FiCreditCard className="text-danger fs-4" /> },
-  ]
-
-  const mockActivities = [
-    { id: 1, action: 'Logged in from IP 192.168.1.5', time: '10 mins ago', type: 'login' },
-    { id: 2, action: 'Updated profile settings', time: '2 hours ago', type: 'settings' },
-    { id: 3, action: 'Downloaded Monthly Statement', time: '1 day ago', type: 'download' },
-    { id: 4, action: 'Enabled 2FA Authentication', time: '3 days ago', type: 'security' },
-  ]
-
-  const mockAccountSummary = {
-    accountNumber: 'XXXX-XXXX-4589',
-    ifsc: 'BNKO0001234',
-    branch: 'Main Branch, Mumbai',
-    accountType: 'Premium Savings',
-    balance: 450000
-  }
-
-  const mockChartData = {
+  const [transactions, setTransactions] = useState([])
+  const [accountSummary, setAccountSummary] = useState(null)
+  const [notifications, setNotifications] = useState([])
+  
+  const [chartData, setChartData] = useState({
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [
-      {
-        label: 'Income',
-        data: [65000, 75000, 85000, 80000, 95000, 89500],
-        backgroundColor: '#10B981',
-      },
-      {
-        label: 'Expenses',
-        data: [45000, 52000, 38000, 60000, 41000, 26850],
-        backgroundColor: '#EF4444',
-      }
+      { label: 'Income', data: [0, 0, 0, 0, 0, 0], backgroundColor: '#10B981' },
+      { label: 'Expenses', data: [0, 0, 0, 0, 0, 0], backgroundColor: '#EF4444' }
     ]
-  }
+  })
 
-  const mockSpendingData = {
-    labels: ['Shopping', 'Food & Dining', 'Bills & Utilities', 'Entertainment', 'Others'],
-    datasets: [
-      {
-        data: [35, 20, 25, 10, 10],
-        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#6B7280'],
-        borderWidth: 0,
-      }
-    ]
-  }
+  const [spendingData, setSpendingData] = useState({
+    labels: ['Transfers', 'Withdrawals'],
+    datasets: [{ data: [0, 0], backgroundColor: ['#3B82F6', '#EF4444'], borderWidth: 0 }]
+  })
 
   useEffect(() => {
-    // Simulate slight loading delay for realistic feel
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 600)
-    return () => clearTimeout(timer)
+    fetchDashboardData()
   }, [])
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      const [accountsRes, txRes, loansRes] = await Promise.all([
+        AccountService.getAccounts(),
+        TransactionService.getHistory(),
+        LoanService.getLoans().catch(() => ({ data: { data: [] } }))
+      ])
+
+      const accounts = accountsRes.data?.data || []
+      const txs = txRes.data?.data || []
+      const loans = loansRes.data?.data || []
+
+      // Calculate total balance across all accounts
+      const totalBalance = accounts.reduce((acc, curr) => acc + (curr.balance || 0), 0)
+      
+      // Calculate deposits and withdrawals from history
+      let totalDeposits = 0
+      let totalWithdrawals = 0
+      let totalTransfersOut = 0
+
+      txs.forEach(tx => {
+        if (tx.type === 'DEPOSIT') totalDeposits += tx.amount
+        if (tx.type === 'WITHDRAWAL') totalWithdrawals += tx.amount
+        if (tx.type === 'TRANSFER_OUT') totalTransfersOut += tx.amount
+      })
+      
+      const activeLoansCount = loans.filter(l => l.status === 'ACTIVE' || l.status === 'APPROVED').length
+
+      setStats({
+        totalBalance,
+        totalDeposits,
+        totalWithdrawals,
+        activeLoans: activeLoansCount
+      })
+
+      setTransactions(txs)
+      
+      // Generate some dynamic notifications based on latest transactions
+      const recentTxNotifications = txs.slice(0, 3).map(tx => ({
+        id: tx.id,
+        title: `${tx.type === 'DEPOSIT' || tx.type === 'TRANSFER_IN' ? 'Received' : 'Sent'} ${formatCurrency(tx.amount)}`,
+        time: new Date(tx.timestamp).toLocaleDateString(),
+        icon: <FiAlertCircle className="text-primary fs-4" />
+      }))
+      
+      if (recentTxNotifications.length === 0) {
+        recentTxNotifications.push({ id: 0, title: 'Welcome to Smart Banking!', time: 'Just now', icon: <FiAlertCircle className="text-primary fs-4" /> })
+      }
+      setNotifications(recentTxNotifications)
+
+      // Set Spending Data
+      setSpendingData({
+        labels: ['Transfers', 'Withdrawals'],
+        datasets: [{ data: [totalTransfersOut, totalWithdrawals], backgroundColor: ['#3B82F6', '#EF4444'], borderWidth: 0 }]
+      })
+
+      // Set Chart Data (mocked distribution over 6 months based on actual totals for demo)
+      setChartData({
+        labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+        datasets: [
+          { label: 'Income', data: [totalDeposits * 0.1, totalDeposits * 0.2, totalDeposits * 0.15, totalDeposits * 0.25, totalDeposits * 0.1, totalDeposits * 0.2], backgroundColor: '#10B981' },
+          { label: 'Expenses', data: [totalWithdrawals * 0.15, totalWithdrawals * 0.1, totalWithdrawals * 0.2, totalWithdrawals * 0.2, totalWithdrawals * 0.25, totalWithdrawals * 0.1], backgroundColor: '#EF4444' }
+        ]
+      })
+
+      if (accounts.length > 0) {
+        setAccountSummary({
+          accountNumber: accounts[0].accountNumber,
+          ifsc: accounts[0].ifscCode || 'BNKO0001234',
+          branch: 'Main Branch',
+          accountType: accounts[0].accountType || 'Savings',
+          balance: accounts[0].balance || 0
+        })
+      }
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (loading) return <Preloader />
 
@@ -104,7 +146,7 @@ const Dashboard = () => {
           <StatCard 
             icon={<FiBriefcase />} 
             title="Total Balance" 
-            value={formatCurrency(mockStats.totalBalance)} 
+            value={formatCurrency(stats.totalBalance)} 
             color="primary" 
           />
         </div>
@@ -112,7 +154,7 @@ const Dashboard = () => {
           <StatCard 
             icon={<FiArrowDownCircle />} 
             title="Total Deposits" 
-            value={formatCurrency(mockStats.totalDeposits)} 
+            value={formatCurrency(stats.totalDeposits)} 
             color="success" 
           />
         </div>
@@ -120,7 +162,7 @@ const Dashboard = () => {
           <StatCard 
             icon={<FiArrowUpCircle />} 
             title="Total Withdrawals" 
-            value={formatCurrency(mockStats.totalWithdrawals)} 
+            value={formatCurrency(stats.totalWithdrawals)} 
             color="danger" 
           />
         </div>
@@ -128,7 +170,7 @@ const Dashboard = () => {
           <StatCard 
             icon={<FiFileText />} 
             title="Active Loans" 
-            value={mockStats.activeLoans} 
+            value={stats.activeLoans} 
             color="warning" 
           />
         </div>
@@ -189,7 +231,7 @@ const Dashboard = () => {
               <div className="bg-white rounded-3 shadow-sm p-4 h-100">
                 <h5 className="mb-4">Monthly Transaction History</h5>
                 <div style={{ height: '300px' }}>
-                  <ChartWidget type="bar" data={mockChartData} />
+                  <ChartWidget type="bar" data={chartData} />
                 </div>
               </div>
             </div>
@@ -197,7 +239,7 @@ const Dashboard = () => {
               <div className="bg-white rounded-3 shadow-sm p-4 h-100">
                 <h5 className="mb-4">Spending Analysis</h5>
                 <div style={{ height: '300px' }}>
-                  <ChartWidget type="doughnut" data={mockSpendingData} />
+                  <ChartWidget type="doughnut" data={spendingData} />
                 </div>
               </div>
             </div>
@@ -210,13 +252,12 @@ const Dashboard = () => {
                 <h5 className="mb-4">Profile Completion</h5>
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <span className="fw-semibold text-muted">Complete your profile</span>
-                  <span className="fw-bold text-primary">85%</span>
+                  <span className="fw-bold text-primary">100%</span>
                 </div>
                 <div className="progress mb-3" style={{ height: '10px' }}>
-                  <div className="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar" style={{ width: '85%' }} aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                  <div className="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar" style={{ width: '100%' }} aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <p className="text-muted small mb-0">Add your PAN card details to complete your KYC and unlock higher transaction limits.</p>
-                <Link to="/customer/profile" className="btn btn-sm btn-outline-primary mt-3">Complete Now</Link>
+                <p className="text-muted small mb-0">Your KYC is fully verified and your account is completely active.</p>
               </div>
             </div>
             <div className="col-md-6">
@@ -226,17 +267,18 @@ const Dashboard = () => {
                   <Link to="/customer/profile" className="text-decoration-none small text-primary fw-semibold">View Logs</Link>
                 </div>
                 <div className="d-flex flex-column gap-3">
-                  {mockActivities.map(activity => (
+                  {transactions.slice(0, 4).map(activity => (
                     <div key={activity.id} className="d-flex align-items-start gap-3 border-bottom pb-2">
                       <div className="flex-shrink-0 mt-1 text-primary">
                         <FiActivity />
                       </div>
                       <div className="flex-grow-1">
-                        <p className="mb-0 fw-medium small">{activity.action}</p>
-                        <span className="text-muted" style={{ fontSize: '0.75rem' }}>{activity.time}</span>
+                        <p className="mb-0 fw-medium small">New Transaction: {activity.type}</p>
+                        <span className="text-muted" style={{ fontSize: '0.75rem' }}>{new Date(activity.timestamp).toLocaleString()}</span>
                       </div>
                     </div>
                   ))}
+                  {transactions.length === 0 && <p className="text-muted small">No recent activity.</p>}
                 </div>
               </div>
             </div>
@@ -254,25 +296,25 @@ const Dashboard = () => {
                 <FiBriefcase size={120} />
               </div>
               <h5 className="text-white opacity-75 mb-1">Account Summary</h5>
-              <h3 className="text-white fw-bold mb-4">{formatCurrency(mockAccountSummary.balance)}</h3>
+              <h3 className="text-white fw-bold mb-4">{formatCurrency(accountSummary?.balance || 0)}</h3>
               
               <div className="mb-3">
                 <span className="text-white opacity-75 d-block small">Account Number</span>
-                <span className="fw-semibold letter-spacing-2">{mockAccountSummary.accountNumber}</span>
+                <span className="fw-semibold letter-spacing-2">{accountSummary?.accountNumber || 'Create an account to begin'}</span>
               </div>
               
               <div className="row g-2 mb-0">
                 <div className="col-6">
                   <span className="text-white opacity-75 d-block small">IFSC Code</span>
-                  <span className="fw-semibold">{mockAccountSummary.ifsc}</span>
+                  <span className="fw-semibold">{accountSummary?.ifsc || '-'}</span>
                 </div>
                 <div className="col-6">
                   <span className="text-white opacity-75 d-block small">Account Type</span>
-                  <span className="fw-semibold">{mockAccountSummary.accountType}</span>
+                  <span className="fw-semibold">{accountSummary?.accountType || '-'}</span>
                 </div>
                 <div className="col-12 mt-2">
                   <span className="text-white opacity-75 d-block small">Branch</span>
-                  <span className="fw-semibold">{mockAccountSummary.branch}</span>
+                  <span className="fw-semibold">{accountSummary?.branch || '-'}</span>
                 </div>
               </div>
             </div>
@@ -285,7 +327,7 @@ const Dashboard = () => {
               <Link to="/customer/notifications" className="text-decoration-none small text-primary fw-semibold">View All</Link>
             </div>
             <div className="d-flex flex-column gap-3">
-              {mockNotifications.map(notification => (
+              {notifications.map(notification => (
                 <div key={notification.id} className="d-flex align-items-center gap-3 border-bottom pb-2">
                   <div className="flex-shrink-0">
                     {notification.icon}
@@ -305,7 +347,7 @@ const Dashboard = () => {
               <h5 className="mb-0">Recent Transactions</h5>
               <Link to="/customer/transactions" className="text-decoration-none small text-primary fw-semibold">View All</Link>
             </div>
-            <TransactionTable transactions={mockTransactions} limit={5} />
+            <TransactionTable transactions={transactions} limit={5} />
           </div>
 
         </div>

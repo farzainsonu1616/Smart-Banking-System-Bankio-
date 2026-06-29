@@ -9,34 +9,32 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts'
 
-const StatCard = ({ title, value, icon, trend, change, gradient }) => (
-  <div className="card border-0 shadow-sm rounded-4 h-100 overflow-hidden" style={{ background: '#fff' }}>
-    <div className="card-body p-4 position-relative">
-      <div 
-        className="position-absolute top-0 end-0 p-3 opacity-25" 
-        style={{ fontSize: '4rem', transform: 'translate(10%, -10%)', color: 'var(--bs-primary)' }}
-      >
-        {icon}
-      </div>
-      <div className="d-flex align-items-center mb-3">
-        <div 
-          className="d-flex align-items-center justify-content-center rounded-4 me-3 text-white" 
-          style={{ width: '48px', height: '48px', background: gradient }}
-        >
-          {icon}
+import { Link } from 'react-router-dom'
+
+const StatCard = ({ title, value, icon, trend, change, gradient, linkTo }) => (
+  <Link to={linkTo} style={{ textDecoration: 'none' }} className="d-block h-100">
+    <div className="card border-0 shadow-sm rounded-4 h-100 overflow-hidden hover-lift" style={{ background: '#fff', transition: 'all 0.3s ease' }}>
+      <div className="card-body p-4">
+        <div className="d-flex align-items-center mb-3">
+          <div 
+            className="d-flex align-items-center justify-content-center rounded-4 me-3 text-white" 
+            style={{ width: '48px', height: '48px', background: gradient }}
+          >
+            {icon}
+          </div>
+          <h6 className="text-muted fw-bold mb-0 text-uppercase" style={{ letterSpacing: '0.5px' }}>{title}</h6>
         </div>
-        <h6 className="text-muted fw-bold mb-0 text-uppercase" style={{ letterSpacing: '0.5px' }}>{title}</h6>
-      </div>
-      <h3 className="fw-bolder mb-2 text-dark">{value}</h3>
-      <div className="d-flex align-items-center">
-        <span className={`badge ${trend === 'up' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} rounded-pill me-2`}>
-          {trend === 'up' ? <FiTrendingUp className="me-1"/> : <FiTrendingDown className="me-1"/>}
-          {change}
-        </span>
-        <small className="text-muted fw-medium">vs last month</small>
+        <h3 className="fw-bolder mb-2 text-dark">{value}</h3>
+        <div className="d-flex align-items-center">
+          <span className={`badge ${trend === 'up' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} rounded-pill me-2`}>
+            {trend === 'up' ? <FiTrendingUp className="me-1"/> : <FiTrendingDown className="me-1"/>}
+            {change}
+          </span>
+          <small className="text-muted fw-medium">vs last month</small>
+        </div>
       </div>
     </div>
-  </div>
+  </Link>
 )
 
 const SuperAdminDashboard = () => {
@@ -84,22 +82,22 @@ const SuperAdminDashboard = () => {
       {/* Top Statistics Cards */}
       <div className="row gy-4 mb-5">
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard title="Total Branches" value="42" icon={<FiMapPin size={24}/>} trend="up" change="+2.0%" gradient="linear-gradient(135deg, #64748B, #475569)" />
+          <StatCard title="Total Branches" value="42" icon={<FiMapPin size={24}/>} trend="up" change="+2.0%" gradient="linear-gradient(135deg, #64748B, #475569)" linkTo="/super-admin/branches" />
         </div>
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard title="Total Admins" value="15" icon={<FiShield size={24}/>} trend="down" change="-6.6%" gradient="linear-gradient(135deg, #EC4899, #DB2777)" />
+          <StatCard title="Total Admins" value="15" icon={<FiShield size={24}/>} trend="down" change="-6.6%" gradient="linear-gradient(135deg, #EC4899, #DB2777)" linkTo="/super-admin/admins" />
         </div>
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard title="Total Managers" value="45" icon={<FiBriefcase size={24}/>} trend="up" change="+5.2%" gradient="linear-gradient(135deg, #8B5CF6, #6D28D9)" />
+          <StatCard title="Total Managers" value="45" icon={<FiBriefcase size={24}/>} trend="up" change="+5.2%" gradient="linear-gradient(135deg, #8B5CF6, #6D28D9)" linkTo="/super-admin/managers" />
         </div>
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard title="Total Customers" value="24,500" icon={<FiUsers size={24}/>} trend="up" change="+12.4%" gradient="linear-gradient(135deg, #3B82F6, #2563EB)" />
+          <StatCard title="Total Customers" value="24,500" icon={<FiUsers size={24}/>} trend="up" change="+12.4%" gradient="linear-gradient(135deg, #3B82F6, #2563EB)" linkTo="/super-admin/users" />
         </div>
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard title="Total Revenue" value="$8.4M" icon={<FiDollarSign size={24}/>} trend="up" change="+22.5%" gradient="linear-gradient(135deg, #10B981, #059669)" />
+          <StatCard title="Total Revenue" value="$8.4M" icon={<FiDollarSign size={24}/>} trend="up" change="+22.5%" gradient="linear-gradient(135deg, #10B981, #059669)" linkTo="/super-admin/transactions" />
         </div>
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard title="System Health" value="100%" icon={<FiActivity size={24}/>} trend="up" change="Stable" gradient="linear-gradient(135deg, #F59E0B, #D97706)" />
+          <StatCard title="System Health" value="100%" icon={<FiActivity size={24}/>} trend="up" change="Stable" gradient="linear-gradient(135deg, #F59E0B, #D97706)" linkTo="/super-admin/dashboard" />
         </div>
       </div>
 

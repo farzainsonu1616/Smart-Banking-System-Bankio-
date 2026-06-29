@@ -50,7 +50,7 @@ const Register = () => {
           <div className="col-lg-6 col-md-8 col-12">
             <div className="form-content text-center position-relative p-3 p-md-5 mx-2 mx-md-0" style={{ maxHeight: '100dvh', overflowY: 'auto' }}>
               <div className="text-start mb-2 mb-md-4">
-                <Link to="/" className="text-white opacity-75 text-decoration-none d-inline-flex align-items-center small">
+                <Link to="/" className="text-muted text-decoration-none d-inline-flex align-items-center small hover-lift">
                   <FiArrowLeft className="me-2" /> Back to Home
                 </Link>
               </div>
@@ -70,8 +70,8 @@ const Register = () => {
                 </svg>
                 <span style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontWeight: '800', background: 'linear-gradient(45deg, #60A5FA, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '1px' }}>Bankio</span>
               </Link>
-              <h4 className="mb-1 mb-md-2 fw-bold text-white fs-5 fs-md-3">Create an Account</h4>
-              <p className="text-light opacity-75 mb-3 mb-md-4 small">Join Smart Banking today.</p>
+              <h4 className="mb-1 mb-md-2 fw-bold text-dark fs-5 fs-md-3">Create an Account</h4>
+              <p className="text-muted mb-3 mb-md-4 small">Join Smart Banking today.</p>
               
               <form onSubmit={handleSubmit} className="text-start">
                 <div className="row g-2 g-md-3">
@@ -112,7 +112,7 @@ const Register = () => {
                 </button>
               </form>
               
-              <p className="mt-3 mb-0 small text-light">
+              <p className="mt-3 mb-0 small text-muted">
                 Already have an account? <Link to="/login" className="text-primary fw-bold text-decoration-none">Sign In</Link>
               </p>
             </div>

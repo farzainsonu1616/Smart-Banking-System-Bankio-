@@ -19,6 +19,9 @@ public class LoanDTO {
     private BigDecimal interestRate;
     private Integer tenureMonths;
     private String status; // PENDING, APPROVED, REJECTED, ACTIVE, CLOSED
+    private BigDecimal monthlyEmi;
+    private BigDecimal totalPayable;
+    private String remarks;
     private Long userId;
     private LocalDateTime appliedAt;
     private LocalDateTime approvedAt;

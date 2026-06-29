@@ -1,21 +1,51 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
+import AdminService from '../../services/AdminService'
+import Preloader from '../../components/Common/Preloader'
+import { exportCSV } from '../../utils/exportCSV'
+import { formatCurrency } from '../../utils/Helpers'
 import { FiSearch, FiFilter, FiDownload, FiEye } from 'react-icons/fi'
 
 const ManageTransactions = () => {
+  const [transactions, setTransactions] = useState([])
+  const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [typeFilter, setTypeFilter] = useState('ALL')
 
-  const mockTransactions = [
-    { id: 'TXN849201', date: '2026-06-21 10:30 AM', sender: 'John Doe', receiver: 'Jane Smith', amount: 5000, type: 'INTERNAL', status: 'SUCCESS' },
-    { id: 'TXN849202', date: '2026-06-21 11:15 AM', sender: 'Mike Johnson', receiver: 'HDFC Bank (External)', amount: 12000, type: 'EXTERNAL', status: 'PENDING' },
-    { id: 'TXN849203', date: '2026-06-20 02:45 PM', sender: 'Emily Davis', receiver: 'Amazon India', amount: 3499, type: 'PAYMENT', status: 'SUCCESS' },
-    { id: 'TXN849204', date: '2026-06-20 09:20 AM', sender: 'John Doe', receiver: 'Unknown (Suspected)', amount: 50000, type: 'EXTERNAL', status: 'FAILED' },
-  ]
+  useEffect(() => {
+    fetchTransactions()
+  }, [])
 
-  const filteredTxns = mockTransactions.filter(txn => 
-    txn.id.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    txn.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    txn.receiver.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const fetchTransactions = async () => {
+    try {
+      const res = await AdminService.getAllTransactions()
+      setTransactions(res.data.data || [])
+    } catch (error) {
+      toast.error('Failed to load transactions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleExport = () => {
+    exportCSV(transactions, `transactions_export_${new Date().toISOString().split('T')[0]}`)
+    toast.success('Transactions exported successfully')
+  }
+
+  if (loading) return <Preloader />
+
+  const filteredTxns = transactions.filter(txn => {
+    const term = searchTerm.toLowerCase()
+    const matchesSearch = 
+      (txn.transactionId || '').toLowerCase().includes(term) || 
+      (txn.description || '').toLowerCase().includes(term) ||
+      String(txn.accountId || '').includes(term) ||
+      String(txn.targetAccountId || '').includes(term)
+    
+    const matchesType = typeFilter === 'ALL' || txn.type === typeFilter
+
+    return matchesSearch && matchesType
+  }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
 
   return (
     <div className="container-fluid py-4">
@@ -27,15 +57,24 @@ const ManageTransactions = () => {
             <input 
               type="text" 
               className="form-control border-start-0 ps-0" 
-              placeholder="Search TXN ID or Name..." 
+              placeholder="Search TXN ID, Desc, Acc..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="btn btn-outline-secondary d-flex align-items-center gap-2">
-            <FiFilter /> Filter
-          </button>
-          <button className="btn btn-outline-primary d-flex align-items-center gap-2">
+          <select 
+            className="form-select" 
+            style={{ maxWidth: '150px' }}
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="ALL">All Types</option>
+            <option value="DEPOSIT">Deposit</option>
+            <option value="WITHDRAWAL">Withdrawal</option>
+            <option value="TRANSFER_IN">Transfer In</option>
+            <option value="TRANSFER_OUT">Transfer Out</option>
+          </select>
+          <button className="btn btn-outline-primary d-flex align-items-center gap-2" onClick={handleExport}>
             <FiDownload /> Export
           </button>
         </div>
@@ -48,23 +87,28 @@ const ManageTransactions = () => {
               <tr>
                 <th>Transaction ID</th>
                 <th>Date & Time</th>
-                <th>Sender</th>
-                <th>Receiver</th>
+                <th>Account ID</th>
+                <th>Target Acc ID</th>
                 <th>Type</th>
                 <th>Amount</th>
+                <th>Description</th>
                 <th>Status</th>
-                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredTxns.map(txn => (
                 <tr key={txn.id}>
-                  <td className="font-monospace fw-medium text-primary">{txn.id}</td>
-                  <td>{txn.date}</td>
-                  <td>{txn.sender}</td>
-                  <td>{txn.receiver}</td>
-                  <td><span className="badge bg-light text-dark border">{txn.type}</span></td>
-                  <td className="fw-bold">INR {txn.amount.toLocaleString()}</td>
+                  <td className="font-monospace fw-medium text-primary">{txn.transactionId}</td>
+                  <td>{txn.timestamp ? new Date(txn.timestamp).toLocaleString() : '-'}</td>
+                  <td>{txn.accountId ? `ACC-${txn.accountId}` : '-'}</td>
+                  <td>{txn.targetAccountId ? `ACC-${txn.targetAccountId}` : '-'}</td>
+                  <td>
+                    <span className="badge bg-light text-dark border">
+                      {txn.type}
+                    </span>
+                  </td>
+                  <td className="fw-bold">{formatCurrency(txn.amount)}</td>
+                  <td className="text-truncate" style={{ maxWidth: '150px' }} title={txn.description}>{txn.description}</td>
                   <td>
                     <span className={`badge ${
                       txn.status === 'SUCCESS' ? 'bg-success bg-opacity-10 text-success' : 
@@ -73,11 +117,6 @@ const ManageTransactions = () => {
                     }`}>
                       {txn.status}
                     </span>
-                  </td>
-                  <td>
-                    <button className="btn btn-sm btn-light border" title="View Details">
-                      <FiEye className="text-muted" />
-                    </button>
                   </td>
                 </tr>
               ))}

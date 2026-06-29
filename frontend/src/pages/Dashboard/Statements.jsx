@@ -4,24 +4,16 @@ import { toast } from 'react-toastify'
 import TransactionTable from '../../components/DashboardWidgets/TransactionTable'
 import Preloader from '../../components/Common/Preloader'
 import { exportToPDF, exportToExcel } from '../../utils/exportUtils'
+import TransactionService from '../../services/TransactionService'
 
 const Statements = () => {
   const [loading, setLoading] = useState(true)
-  const [filterType, setFilterType] = useState('monthly')
+  const [transactions, setTransactions] = useState([])
+  const [filteredTransactions, setFilteredTransactions] = useState([])
+  const [filterType, setFilterType] = useState('all')
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
   const [isExporting, setIsExporting] = useState(false)
-
-  // Realistic mock data for transactions
-  const mockTransactions = [
-    { id: 1, transactionDate: '2026-06-20T10:30:00Z', referenceNumber: 'TXN89347593', description: 'Amazon Web Services', type: 'WITHDRAWAL', amount: 1500, status: 'COMPLETED' },
-    { id: 2, transactionDate: '2026-06-19T14:15:00Z', referenceNumber: 'TXN89347594', description: 'Salary NEFT', type: 'DEPOSIT', amount: 85000, status: 'COMPLETED' },
-    { id: 3, transactionDate: '2026-06-18T09:45:00Z', referenceNumber: 'TXN89347595', description: 'Starbucks Coffee', type: 'WITHDRAWAL', amount: 350, status: 'COMPLETED' },
-    { id: 4, transactionDate: '2026-06-17T18:20:00Z', referenceNumber: 'TXN89347596', description: 'Rent Transfer', type: 'TRANSFER_OUT', amount: 25000, status: 'PENDING' },
-    { id: 5, transactionDate: '2026-06-16T11:10:00Z', referenceNumber: 'TXN89347597', description: 'Dividend Credit', type: 'DEPOSIT', amount: 4500, status: 'COMPLETED' },
-    { id: 6, transactionDate: '2026-06-10T08:30:00Z', referenceNumber: 'TXN89347598', description: 'Grocery Store', type: 'WITHDRAWAL', amount: 2100, status: 'COMPLETED' },
-    { id: 7, transactionDate: '2026-06-05T19:00:00Z', referenceNumber: 'TXN89347599', description: 'Gym Membership', type: 'WITHDRAWAL', amount: 1200, status: 'COMPLETED' },
-  ]
 
   const columns = [
     { header: 'Date', key: 'transactionDate' },
@@ -33,19 +25,64 @@ const Statements = () => {
   ]
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 600)
-    return () => clearTimeout(timer)
+    fetchTransactions()
   }, [])
 
+  const fetchTransactions = async () => {
+    try {
+      const res = await TransactionService.getHistory()
+      if (res.data && res.data.data) {
+        const sorted = res.data.data.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate))
+        setTransactions(sorted)
+        setFilteredTransactions(sorted)
+      }
+    } catch (error) {
+      toast.error('Failed to load transactions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    applyFilter()
+  }, [filterType, fromDate, toDate, transactions])
+
+  const applyFilter = () => {
+    const now = new Date()
+    let filtered = [...transactions]
+
+    if (filterType === 'daily') {
+      filtered = filtered.filter(t => new Date(t.transactionDate).toDateString() === now.toDateString())
+    } else if (filterType === 'weekly') {
+      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      filtered = filtered.filter(t => new Date(t.transactionDate) >= oneWeekAgo)
+    } else if (filterType === 'monthly') {
+      const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      filtered = filtered.filter(t => new Date(t.transactionDate) >= oneMonthAgo)
+    } else if (filterType === 'custom' && fromDate && toDate) {
+      const start = new Date(fromDate)
+      const end = new Date(toDate)
+      end.setHours(23, 59, 59, 999)
+      filtered = filtered.filter(t => {
+        const txDate = new Date(t.transactionDate)
+        return txDate >= start && txDate <= end
+      })
+    }
+
+    setFilteredTransactions(filtered)
+  }
+
   const handleExportPDF = () => {
+    if (filteredTransactions.length === 0) {
+      toast.warning('No transactions to export')
+      return
+    }
     toast.info('Preparing PDF statement for download...')
     try {
-      const exportData = mockTransactions.map(t => ({
+      const exportData = filteredTransactions.map(t => ({
         ...t,
         transactionDate: new Date(t.transactionDate).toLocaleString(),
-        amount: `$${t.amount.toLocaleString()}`
+        amount: `${t.amount.toLocaleString()}`
       }))
       exportToPDF(exportData, columns, `Statement_${filterType}.pdf`)
       toast.success('PDF statement downloaded successfully!')
@@ -55,15 +92,19 @@ const Statements = () => {
   }
 
   const handleExportExcel = () => {
+    if (filteredTransactions.length === 0) {
+      toast.warning('No transactions to export')
+      return
+    }
     setIsExporting(true)
     toast.info('Generating Excel file...')
     
     setTimeout(() => {
       try {
-        const exportData = mockTransactions.map(t => ({
+        const exportData = filteredTransactions.map(t => ({
           ...t,
           transactionDate: new Date(t.transactionDate).toLocaleString(),
-          amount: `$${t.amount.toLocaleString()}`
+          amount: `${t.amount.toLocaleString()}`
         }))
         exportToExcel(exportData, columns, `Statement_${filterType}.xlsx`)
         toast.success('Excel statement downloaded successfully!')
@@ -99,6 +140,7 @@ const Statements = () => {
                   value={filterType} 
                   onChange={(e) => setFilterType(e.target.value)}
                 >
+                  <option value="all">All Time</option>
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
@@ -149,12 +191,14 @@ const Statements = () => {
         <div className="col-12">
           <div className="bg-white rounded-3 shadow-sm p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h5 className="mb-0">Transaction Preview <span className="badge bg-light text-dark ms-2 fw-normal fs-6">Account: XXXX-4589</span></h5>
+              <h5 className="mb-0">Transaction Preview</h5>
               <span className="text-muted small d-none d-md-block">Showing results for: {filterType.charAt(0).toUpperCase() + filterType.slice(1)}</span>
             </div>
             
-            {/* Using the existing TransactionTable component for UI consistency */}
-            <TransactionTable transactions={mockTransactions} />
+            <TransactionTable transactions={filteredTransactions} />
+            {filteredTransactions.length === 0 && (
+              <p className="text-muted text-center py-4">No transactions found for the selected period.</p>
+            )}
           </div>
         </div>
       </div>

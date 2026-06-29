@@ -13,15 +13,6 @@ const DashTransactions = () => {
   const [filterType, setFilterType] = useState('ALL')
   const [isExporting, setIsExporting] = useState(false)
 
-  // Realistic mock fallback to guarantee all statuses are visible for demonstration
-  const mockFallback = [
-    { id: 1, transactionDate: '2026-06-20T10:30:00Z', referenceNumber: 'TXN89347593', description: 'Amazon Web Services', type: 'WITHDRAWAL', amount: 1500, status: 'SUCCESS' },
-    { id: 2, transactionDate: '2026-06-19T14:15:00Z', referenceNumber: 'TXN89347594', description: 'Salary NEFT', type: 'DEPOSIT', amount: 85000, status: 'SUCCESS' },
-    { id: 3, transactionDate: '2026-06-18T09:45:00Z', referenceNumber: 'TXN89347595', description: 'Insufficient Funds - POS', type: 'WITHDRAWAL', amount: 3500, status: 'FAILED' },
-    { id: 4, transactionDate: '2026-06-17T18:20:00Z', referenceNumber: 'TXN89347596', description: 'Rent Transfer', type: 'TRANSFER_OUT', amount: 25000, status: 'PENDING' },
-    { id: 5, transactionDate: '2026-06-16T11:10:00Z', referenceNumber: 'TXN89347597', description: 'Dividend Credit', type: 'DEPOSIT', amount: 4500, status: 'SUCCESS' },
-  ]
-
   useEffect(() => {
     fetchTransactions()
   }, [])
@@ -29,14 +20,15 @@ const DashTransactions = () => {
   const fetchTransactions = async () => {
     try {
       const res = await TransactionService.getHistory()
-      if (res.data && res.data.data && res.data.data.length > 0) {
+      if (res.data && res.data.data) {
         const sorted = res.data.data.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate))
         setTransactions(sorted)
       } else {
-        setTransactions(mockFallback)
+        setTransactions([])
       }
     } catch (error) {
-      setTransactions(mockFallback)
+      toast.error('Failed to fetch transactions')
+      setTransactions([])
     } finally {
       setLoading(false)
     }

@@ -17,18 +17,8 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const res = await AdminService.getStats().catch(() => ({ data: { data: {} } }))
-      const baseStats = res?.data?.data || {}
-      
-      setStats({
-        ...baseStats,
-        totalUsers: baseStats.totalUsers || 12450,
-        totalAccounts: baseStats.totalAccounts || 15230,
-        totalTransactions: 84392,
-        totalLoans: baseStats.pendingLoans || 842,
-        totalCards: baseStats.totalCards || 4210,
-        revenue: 1254300
-      })
+      const res = await AdminService.getStats()
+      setStats(res.data.data || {})
     } catch (error) {
       toast.error('Failed to load admin stats')
     } finally {
@@ -105,7 +95,7 @@ const AdminDashboard = () => {
           <StatCard icon={<FiCreditCard />} title="Total Cards" value={stats?.totalCards} color="danger" />
         </div>
         <div className="col-xl-2 col-md-4 col-sm-6">
-          <StatCard icon={<FiTrendingUp />} title="Revenue" value={formatCurrency(stats?.revenue)} color="primary" />
+          <StatCard icon={<FiTrendingUp />} title="Total Balance" value={formatCurrency(stats?.totalBalance)} color="primary" />
         </div>
       </div>
 

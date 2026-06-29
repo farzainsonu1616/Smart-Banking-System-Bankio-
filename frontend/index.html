@@ -4,8 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/assets/images/fav.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Smart Banking System - Secure, Modern, and Reliable Digital Banking Solutions" />
-    <title>Smart Banking System</title>
+    <meta name="description" content="Bankio - Secure, Modern, and Reliable Digital Banking Solutions for Personal and Business needs." />
+    <meta name="keywords" content="Banking, NeoBank, Digital Banking, Secure Transactions, Finance, Bankio" />
+    <meta name="author" content="Bankio Inc." />
+    <meta property="og:title" content="Bankio Smart Banking" />
+    <meta property="og:description" content="The next generation of digital banking. Secure, fast, and reliable." />
+    <meta property="og:type" content="website" />
+    <title>Bankio - Next Generation Smart Banking</title>
     <script>
       // Workaround for Blackbox Chrome Extension CORS/404 errors
       const originalFetch = window.fetch;
@@ -24,18 +29,16 @@
 
       // Suppress the "Uncaught (in promise) TypeError: Failed to fetch" from the extension
       window.addEventListener('unhandledrejection', function(event) {
-        if (event.reason && event.reason.message === 'Failed to fetch') {
-          const stack = event.reason.stack || '';
-          if (stack.includes('index.iife.js') || stack.includes('useblackbox.io')) {
-            event.preventDefault();
-          }
+        if (event.reason && (event.reason.message === 'Failed to fetch' || event.reason.message.includes('fetch'))) {
+          // Prevent the default browser console error logging for this specific extension issue
+          event.preventDefault();
         }
       });
       
       // Also intercept console.error for this specific error just in case
       const originalConsoleError = console.error;
       console.error = function(...args) {
-        if (typeof args[0] === 'string' && args[0].includes('useblackbox.io')) {
+        if (typeof args[0] === 'string' && (args[0].includes('useblackbox.io') || args[0].includes('index.iife.js'))) {
           return;
         }
         return originalConsoleError.apply(console, args);

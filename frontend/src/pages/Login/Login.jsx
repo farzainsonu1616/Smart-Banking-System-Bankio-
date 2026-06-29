@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { FiArrowLeft } from 'react-icons/fi'
 import AuthService from '../../services/AuthService'
+import { useAuth } from '../../context/AuthContext'
 
 const Login = () => {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
 
@@ -20,26 +22,25 @@ const Login = () => {
       const response = await AuthService.login(formData)
       const { accessToken, refreshToken, user } = response.data.data
       
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
-      localStorage.setItem('user', JSON.stringify(user))
+      // Use AuthContext login to properly set state for PrivateRoute
+      login(accessToken, refreshToken, user)
       
       toast.success('Login successful!')
       
-      // Delay the reload so the user can see the success toast before redirecting
+      // Navigate using React Router instead of window.location for SPA behavior
       setTimeout(() => {
         if (user.roles && user.roles.includes('ROLE_CUSTOMER')) {
-            window.location.href = '/customer/dashboard'
+            navigate('/customer/dashboard')
         } else if (user.roles && user.roles.includes('ROLE_ADMIN')) {
-            window.location.href = '/admin/dashboard'
+            navigate('/admin/dashboard')
         } else if (user.roles && user.roles.includes('ROLE_MANAGER')) {
-            window.location.href = '/manager/dashboard'
+            navigate('/manager/dashboard')
         } else if (user.roles && user.roles.includes('ROLE_SUPER_ADMIN')) {
-            window.location.href = '/super-admin/dashboard'
+            navigate('/super-admin/dashboard')
         } else {
-            window.location.href = '/home'
+            navigate('/')
         }
-      }, 1500)
+      }, 500)
       
     } catch (error) {
       const errorMessage = error.response?.data?.message;
@@ -63,7 +64,7 @@ const Login = () => {
           <div className="col-lg-5 col-md-8">
             <div className="form-content text-center position-relative">
               <div className="text-start mb-4">
-                <Link to="/" className="text-white opacity-75 text-decoration-none d-inline-flex align-items-center">
+                <Link to="/" className="text-muted text-decoration-none d-inline-flex align-items-center hover-lift">
                   <FiArrowLeft className="me-2" /> Back to Home
                 </Link>
               </div>

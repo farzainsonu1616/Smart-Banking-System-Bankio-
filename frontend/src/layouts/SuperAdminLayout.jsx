@@ -20,11 +20,8 @@ const SuperAdminLayout = () => {
     { path: '/super-admin/cards', icon: <FiCreditCard />, label: 'Cards' },
     { path: '/super-admin/reports', icon: <FiList />, label: 'Reports' },
     { path: '/super-admin/security', icon: <FiShield />, label: 'Security Center' },
-    { path: '/super-admin/database', icon: <FiDatabase />, label: 'Database Monitoring' },
-    { path: '/super-admin/system-config', icon: <FiSliders />, label: 'System Configuration' },
     { path: '/super-admin/roles', icon: <FiKey />, label: 'Role Management' },
     { path: '/super-admin/backups', icon: <FiHardDrive />, label: 'Backup Management' },
-    { path: '/super-admin/system-health', icon: <FiCpu />, label: 'System Health' },
     { path: '/super-admin/profile', icon: <FiUser />, label: 'Profile' },
     { path: '/super-admin/settings', icon: <FiSettings />, label: 'Settings' }
   ]

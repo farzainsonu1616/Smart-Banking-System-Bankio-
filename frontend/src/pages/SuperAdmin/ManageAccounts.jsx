@@ -1,14 +1,38 @@
 import React, { useState } from 'react'
 import { FiSearch, FiEye, FiLock, FiUnlock, FiFilter } from 'react-icons/fi'
+import { toast } from 'react-toastify'
+
+const initialAccounts = [
+  { id: 'ACC1001', customer: 'John Doe', type: 'Savings', balance: '$12,500.00', status: 'Active', branch: 'Mumbai HQ' },
+  { id: 'ACC1002', customer: 'Jane Smith', type: 'Current', balance: '$45,200.00', status: 'Frozen', branch: 'Delhi' },
+  { id: 'ACC1003', customer: 'Robert Johnson', type: 'Fixed Deposit', balance: '$100,000.00', status: 'Active', branch: 'Bangalore' },
+]
 
 const ManageAccounts = () => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState('All')
+  const [accounts, setAccounts] = useState(initialAccounts)
 
-  const accounts = [
-    { id: 'ACC1001', customer: 'John Doe', type: 'Savings', balance: '$12,500.00', status: 'Active', branch: 'Mumbai HQ' },
-    { id: 'ACC1002', customer: 'Jane Smith', type: 'Current', balance: '$45,200.00', status: 'Frozen', branch: 'Delhi' },
-    { id: 'ACC1003', customer: 'Robert Johnson', type: 'Fixed Deposit', balance: '$100,000.00', status: 'Active', branch: 'Bangalore' },
-  ]
+  const handleToggleFreeze = (id, currentStatus) => {
+    setAccounts(accounts.map(acc => {
+      if (acc.id === id) {
+        const newStatus = currentStatus === 'Active' ? 'Frozen' : 'Active'
+        toast.success(`Account ${id} has been ${newStatus.toLowerCase()}`)
+        return { ...acc, status: newStatus }
+      }
+      return acc
+    }))
+  }
+
+  const handleViewDetails = (id) => {
+    toast.info(`Viewing details for account ${id}`)
+  }
+
+  const filteredAccounts = accounts.filter(acc => {
+    const matchesSearch = acc.customer.toLowerCase().includes(searchTerm.toLowerCase()) || acc.id.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesFilter = filterType === 'All' || acc.type === filterType
+    return matchesSearch && matchesFilter
+  })
 
   return (
     <div className="container-fluid py-4">
@@ -19,7 +43,12 @@ const ManageAccounts = () => {
             <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
             <input type="text" className="form-control border-start-0 ps-0" placeholder="Search Account/Customer..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
-          <button className="btn btn-outline-secondary d-flex align-items-center gap-2"><FiFilter /> Filter</button>
+          <select className="form-select" style={{ width: '150px' }} value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+            <option value="All">All Types</option>
+            <option value="Savings">Savings</option>
+            <option value="Current">Current</option>
+            <option value="Fixed Deposit">Fixed Deposit</option>
+          </select>
         </div>
       </div>
 
@@ -39,7 +68,7 @@ const ManageAccounts = () => {
                 </tr>
               </thead>
               <tbody>
-                {accounts.map(acc => (
+                {filteredAccounts.length > 0 ? filteredAccounts.map(acc => (
                   <tr key={acc.id}>
                     <td className="px-4 py-3 border-end-0 fw-bold">{acc.id}</td>
                     <td className="py-3 border-end-0 border-start-0">{acc.customer}</td>
@@ -53,16 +82,18 @@ const ManageAccounts = () => {
                     </td>
                     <td className="text-end px-4 py-3 border-start-0">
                       <div className="d-flex justify-content-end gap-2">
-                        <button className="btn btn-sm btn-light text-primary" title="View Details"><FiEye /></button>
+                        <button onClick={() => handleViewDetails(acc.id)} className="btn btn-sm btn-light text-primary" title="View Details"><FiEye /></button>
                         {acc.status === 'Active' ? (
-                          <button className="btn btn-sm btn-light text-warning" title="Freeze Account"><FiLock /></button>
+                          <button onClick={() => handleToggleFreeze(acc.id, acc.status)} className="btn btn-sm btn-light text-warning" title="Freeze Account"><FiLock /></button>
                         ) : (
-                          <button className="btn btn-sm btn-light text-success" title="Unfreeze Account"><FiUnlock /></button>
+                          <button onClick={() => handleToggleFreeze(acc.id, acc.status)} className="btn btn-sm btn-light text-success" title="Unfreeze Account"><FiUnlock /></button>
                         )}
                       </div>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr><td colSpan="7" className="text-center py-4">No accounts found</td></tr>
+                )}
               </tbody>
             </table>
           </div>

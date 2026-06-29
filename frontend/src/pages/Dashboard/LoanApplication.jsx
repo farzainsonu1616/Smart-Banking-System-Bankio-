@@ -3,8 +3,11 @@ import { FiFileText, FiCheckCircle, FiUploadCloud, FiInfo } from 'react-icons/fi
 import { FaCalculator } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { formatCurrency } from '../../utils/Helpers'
+import LoanService from '../../services/LoanService'
+import { useAuth } from '../../context/AuthContext'
 
 const LoanApplication = () => {
+  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState('apply')
   const [loading, setLoading] = useState(false)
 
@@ -20,14 +23,28 @@ const LoanApplication = () => {
   const [eligibleAmount, setEligibleAmount] = useState(null)
 
   // Handlers
-  const handleLoanSubmit = (e) => {
+  const handleLoanSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    
+    try {
+      const payload = {
+        loanType: loanForm.type.toUpperCase(),
+        amount: parseFloat(loanForm.amount),
+        tenureMonths: parseInt(loanForm.tenure),
+        interestRate: 10.5, // Standard rate for now
+        monthlyEmi: 0, // Backend will calculate this or we can pass calculated
+        status: 'PENDING'
+      }
+
+      await LoanService.applyLoan(user.id, payload)
       toast.success('Loan application submitted successfully! It is now Pending review.')
       setLoanForm({ type: '', amount: '', tenure: '' })
-    }, 1500)
+    } catch (error) {
+      toast.error('Failed to submit loan application.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleFileChange = (e, docType) => {

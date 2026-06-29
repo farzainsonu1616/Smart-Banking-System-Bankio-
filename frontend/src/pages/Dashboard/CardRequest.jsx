@@ -1,19 +1,56 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FiCreditCard, FiCheckCircle } from 'react-icons/fi'
 import { toast } from 'react-toastify'
+import CardService from '../../services/CardService'
+import AccountService from '../../services/AccountService'
 
 const CardRequest = () => {
   const [activeTab, setActiveTab] = useState('debit')
   const [loading, setLoading] = useState(false)
+  const [accounts, setAccounts] = useState([])
+  
+  // Form states
+  const [accountId, setAccountId] = useState('')
+  const [cardType, setCardType] = useState('DEBIT') // Or CREDIT depending on tab
 
-  const handleSimulateRequest = (e, type) => {
+  useEffect(() => {
+    fetchAccounts()
+  }, [])
+
+  const fetchAccounts = async () => {
+    try {
+      const response = await AccountService.getAccounts()
+      if (response.data && response.data.data) {
+        setAccounts(response.data.data)
+      }
+    } catch (error) {
+      toast.error('Failed to load accounts')
+    }
+  }
+
+  const handleSimulateRequest = async (e, type) => {
     e.preventDefault()
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
+    
+    try {
+      const requestType = activeTab === 'debit' ? 'DEBIT' : 'CREDIT'
+      
+      if (!accountId) {
+        toast.error('Please select an account')
+        setLoading(false)
+        return
+      }
+
+      await CardService.requestCard({ accountId: parseInt(accountId), cardType: requestType })
+      
       toast.success(`${type} application submitted successfully! It will be reviewed shortly.`)
       e.target.reset()
-    }, 1500)
+      setAccountId('')
+    } catch (error) {
+      toast.error(error.response?.data?.message || `Failed to request ${type}`)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -59,10 +96,11 @@ const CardRequest = () => {
                   
                   <div className="mb-3">
                     <label className="form-label text-muted small">Select Linked Account</label>
-                    <select className="form-select form-select-lg" required>
+                    <select className="form-select form-select-lg" required value={accountId} onChange={(e) => setAccountId(e.target.value)}>
                       <option value="">Choose Account...</option>
-                      <option value="1">XXXX-XXXX-4589 (Premium Savings)</option>
-                      <option value="2">XXXX-XXXX-1234 (Current Account)</option>
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id}>{acc.accountNumber} (Bal: ${acc.balance})</option>
+                      ))}
                     </select>
                   </div>
                   <div className="mb-3">
@@ -102,6 +140,16 @@ const CardRequest = () => {
                     </div>
                     <h4 className="text-primary">Apply for Credit Card</h4>
                     <p className="text-muted small">Get instant approval based on your relationship with us.</p>
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label text-muted small">Select Linked Account</label>
+                    <select className="form-select form-select-lg" required value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+                      <option value="">Choose Account for Repayment...</option>
+                      {accounts.map(acc => (
+                        <option key={acc.id} value={acc.id}>{acc.accountNumber} (Bal: ${acc.balance})</option>
+                      ))}
+                    </select>
                   </div>
                   
                   <div className="mb-3">

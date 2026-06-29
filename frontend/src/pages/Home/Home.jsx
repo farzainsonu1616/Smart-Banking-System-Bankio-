@@ -20,7 +20,7 @@ const Home = () => {
                 <p className="mb-5 fs-5">Experience the next generation of online banking with Smart Banking System. Fast transactions, better rates, and absolute security.</p>
                 <div className="d-flex gap-3">
                   <Link to="/register" className="cmn-btn">Open Account</Link>
-                  <Link to="/about" className="cmn-btn second text-white border-white hover-primary">Learn More</Link>
+                  <Link to="/about" className="cmn-btn second">Learn More</Link>
                 </div>
               </div>
             </div>

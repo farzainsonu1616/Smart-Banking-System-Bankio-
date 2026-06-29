@@ -1,8 +1,11 @@
 package com.bankingsystem.controller;
 
 import com.bankingsystem.dto.ApiResponse;
+import com.bankingsystem.dto.LoanDTO;
+import com.bankingsystem.dto.TransactionDTO;
 import com.bankingsystem.dto.UserDTO;
 import com.bankingsystem.service.AdminService;
+import com.bankingsystem.service.LoanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +21,7 @@ import java.util.Map;
 public class AdminController {
 
     private final AdminService adminService;
-    private final com.bankingsystem.service.LoanService loanService;
+    private final LoanService loanService;
 
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
@@ -37,6 +40,20 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Void>> approveUser(@PathVariable Long id) {
         adminService.approveUser(id);
         return ResponseEntity.ok(ApiResponse.success("User approved successfully", null));
+    }
+
+    @PutMapping("/users/{id}/activate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> activateUser(@PathVariable Long id) {
+        adminService.activateUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User activated successfully", null));
+    }
+
+    @PutMapping("/users/{id}/deactivate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> deactivateUser(@PathVariable Long id) {
+        adminService.deactivateUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User deactivated successfully", null));
     }
 
     @PutMapping("/users/{id}/freeze")
@@ -61,7 +78,19 @@ public class AdminController {
 
     @GetMapping("/loans")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<List<com.bankingsystem.dto.LoanDTO>>> getAllLoans() {
+    public ResponseEntity<ApiResponse<List<LoanDTO>>> getAllLoans() {
         return ResponseEntity.ok(ApiResponse.success("Loans fetched successfully", loanService.getAllLoans()));
+    }
+
+    @GetMapping("/transactions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<TransactionDTO>>> getAllTransactions() {
+        return ResponseEntity.ok(ApiResponse.success("Transactions fetched successfully", adminService.getAllTransactions()));
+    }
+
+    @GetMapping("/reports")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getReports() {
+        return ResponseEntity.ok(ApiResponse.success("Report data fetched successfully", adminService.getReportData()));
     }
 }

@@ -9,14 +9,6 @@ const DashLoanList = () => {
   const [loans, setLoans] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Realistic mock data to guarantee all statuses are visible for the Tracking Timeline feature
-  const mockLoans = [
-    { id: 'LN1001', loanType: 'HOME', status: 'APPROVED', amount: 5000000, monthlyEmi: 48500, amountPaid: 1455000, totalPayable: 5820000, interestRate: 8.5, tenureMonths: 120, appliedDate: '2022-01-15T10:00:00Z' },
-    { id: 'LN1002', loanType: 'PERSONAL', status: 'UNDER_REVIEW', amount: 300000, monthlyEmi: 9500, amountPaid: 0, totalPayable: 342000, interestRate: 12.5, tenureMonths: 36, appliedDate: '2026-06-18T14:30:00Z' },
-    { id: 'LN1003', loanType: 'VEHICLE', status: 'PENDING', amount: 800000, monthlyEmi: 16500, amountPaid: 0, totalPayable: 990000, interestRate: 9.5, tenureMonths: 60, appliedDate: '2026-06-20T09:15:00Z' },
-    { id: 'LN1004', loanType: 'BUSINESS', status: 'REJECTED', amount: 2500000, monthlyEmi: 55000, amountPaid: 0, totalPayable: 3300000, interestRate: 14.0, tenureMonths: 60, appliedDate: '2026-05-10T11:45:00Z' },
-  ]
-
   useEffect(() => {
     fetchLoans()
   }, [])
@@ -24,13 +16,14 @@ const DashLoanList = () => {
   const fetchLoans = async () => {
     try {
       const res = await LoanService.getLoans()
-      if (res.data && res.data.data && res.data.data.length > 0) {
+      if (res.data && res.data.data) {
         setLoans(res.data.data)
       } else {
-        setLoans(mockLoans) // Use mock data if no loans found to show the timeline features
+        setLoans([])
       }
     } catch (error) {
-      setLoans(mockLoans) // Fallback for UI demonstration
+      toast.error('Failed to fetch loans')
+      setLoans([])
     } finally {
       setLoading(false)
     }
