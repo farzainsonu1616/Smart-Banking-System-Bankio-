@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8081',
+  baseURL: 'https://smart-banking-system-bankio-production.up.railway.app',
   headers: { 'Content-Type': 'application/json' }
 })
 

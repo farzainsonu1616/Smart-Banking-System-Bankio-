@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:8081'
+export const API_BASE_URL = 'https://smart-banking-system-bankio-production.up.railway.app'
 
 export const ACCOUNT_TYPES = [
   { value: 'SAVINGS', label: 'Savings Account' },
