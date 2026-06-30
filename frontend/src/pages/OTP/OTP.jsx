@@ -49,20 +49,7 @@ const OTP = () => {
           <div className="col-lg-5 col-md-8">
             <div className="form-content text-center">
               <Link to="/home" className="mb-4 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
-                <svg width="50" height="50" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="40" height="40" rx="10" fill="url(#paint0_linear_auth)" fillOpacity="0.15"/>
-                  <path d="M20 8L8 15V28C8 29.1046 8.89543 30 10 30H30C31.1046 30 32 29.1046 32 28V15L20 8Z" stroke="url(#paint0_linear_auth)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M16 22H24" stroke="url(#paint0_linear_auth)" strokeWidth="2.5" strokeLinecap="round"/>
-                  <path d="M20 18V26" stroke="url(#paint0_linear_auth)" strokeWidth="2.5" strokeLinecap="round"/>
-                  <circle cx="20" cy="18" r="2" fill="url(#paint0_linear_auth)"/>
-                  <defs>
-                    <linearGradient id="paint0_linear_auth" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#60A5FA"/>
-                      <stop offset="1" stopColor="#A78BFA"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <span style={{ fontSize: '36px', fontWeight: '800', background: 'linear-gradient(45deg, #60A5FA, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '1.5px' }}>Bankio</span>
+                <img src="/assets/images/logo.png" alt="Bankio Logo" style={{ height: '50px', objectFit: 'contain', mixBlendMode: 'multiply' }} />
               </Link>
               <h3 className="mb-2">Verify Your Account</h3>
               <p className="text-muted mb-4">We've sent a 6-digit code to <strong>{email}</strong></p>

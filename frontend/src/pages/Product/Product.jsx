@@ -53,7 +53,7 @@ const Product = () => {
             <div className="col-lg-6 order-2 order-lg-1">
               <span className="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-bold tracking-wider">DIGITAL BANKING</span>
               <h2 className="display-6 fw-bold mb-4">Bank Anytime, Anywhere with Our Mobile App.</h2>
-              <p className="lead text-muted mb-4">Experience the ultimate convenience with the Smart Banking mobile application. Available on iOS and Android.</p>
+              <p className="lead text-muted mb-4">Experience the ultimate convenience with the Bankio mobile application. Available on iOS and Android.</p>
               <ul className="list-unstyled d-flex flex-column gap-3 mb-5">
                 <li className="d-flex align-items-center gap-3"><div className="bg-success text-white rounded-circle p-1"><i className="bi bi-check"></i></div> <span className="fw-medium">Instant Peer-to-Peer Transfers</span></li>
                 <li className="d-flex align-items-center gap-3"><div className="bg-success text-white rounded-circle p-1"><i className="bi bi-check"></i></div> <span className="fw-medium">Real-time Transaction Alerts</span></li>

@@ -5,11 +5,9 @@ import { FiHome, FiUsers, FiGrid, FiDollarSign, FiFileText, FiPieChart, FiUser }
 const ManagerLayout = () => {
   const menuItems = [
     { path: '/manager/dashboard', icon: <FiHome />, label: 'Dashboard', exact: true },
-    { path: '/manager/customers', icon: <FiUsers />, label: 'Customers' },
-    { path: '/manager/accounts', icon: <FiGrid />, label: 'Accounts' },
-    { path: '/manager/loans', icon: <FiFileText />, label: 'Loans' },
-    { path: '/manager/transactions', icon: <FiDollarSign />, label: 'Transactions' },
-    { path: '/manager/reports', icon: <FiPieChart />, label: 'Reports' },
+    { path: '/manager/customers', icon: <FiUsers />, label: 'Branch Customers' },
+    { path: '/manager/loans', icon: <FiFileText />, label: 'Branch Loans' },
+    { path: '/manager/transactions', icon: <FiDollarSign />, label: 'Branch Transactions' },
     { path: '/manager/profile', icon: <FiUser />, label: 'Profile' }
   ]
 

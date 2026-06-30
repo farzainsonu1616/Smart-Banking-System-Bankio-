@@ -18,7 +18,7 @@ const About = () => {
               <div className="about-content ps-lg-5">
                 <span className="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-bold tracking-wider">WHO WE ARE</span>
                 <h2 className="display-6 fw-bold mb-4">We Are Here To Make Your Financial Life Easier.</h2>
-                <p className="lead text-muted mb-4">Smart Banking System is a leading digital banking platform designed to provide secure, fast, and transparent financial services to users worldwide.</p>
+                <p className="lead text-muted mb-4">Bankio is a leading digital banking platform designed to provide secure, fast, and transparent financial services to users worldwide.</p>
                 <p className="text-muted mb-5">With over 10 years of experience in the financial tech industry, our team is dedicated to building the most robust banking infrastructure that puts customers first. We believe banking should be simple, intuitive, and most importantly, accessible to everyone.</p>
                 
                 <div className="row gy-4 border-top pt-4">

@@ -1,76 +1,21 @@
-Customer
 
-User ID: customer@bankio.com
-Password: Customer@123
-Admin
-
-User ID: admin@bankio.com
-Password: Admin@123
-Manager
-
-User ID: manager@bankio.com
-Password: Manager@123
 Super Admin
 
 User ID: superadmin@bankio.com
 Password: SuperAdmin@123
-User ID: farzain@smartbank.com
-Password: Farzain@123
 
+Customer
 
+User ID: customer@bankio.com
+Password: Customer@123
 
-In Bankio, Super Admin portal, 
+Admin
 
-Built the UI template in light theme itself but the layout and other alignment designs and the bg colors were not good. modify it superbly and built it completely superbly. Develop these following contents one by one completely without any errors or delays to be complete properly.
+User ID: admin@bankio.com
+Password: Admin@123
 
-1. Add Light background theme for the All the portals. 
+Manager
 
-2. In Super Admin portal, in Executive dashboard page, there is 6 cards buttons, in that cards there is unwanted symbol icons in the cards so remove that. 
+User ID: manager@bankio.com
+Password: Manager@123
 
-3. Make All the cards to be work properly and lively in the dashboard. 
-
-4. In user management page, in the lsit card actions buttons were not working, make all those actions buttons to be work properly. make the search bar and filter button also to be work properly.
-
-5. In Admin Management, make all those actions buttons to be work properly. make the search bar and filter button also to be work properly.The Add Admin button also make it to work. 
-
-6. In Manager MAnagement, make all those actions buttons to be work properly. make the search bar and Add Manager button also to be work properly.
-
-7. In Branch Management page, make the search bar and filter button also to be work properly and register branch butotn also, then the view details and Analytics button also to be work properly. 
-
-8. IN Account Management and Transaction Management, all the details should be present and display properly, all the buttons, action buttons and search bar to be work properly. 
-
-9. In Loans Management page also make the action buttons and search bar to be work properly. 
-
-10. In Cards Management page also make the action buttons and search bar to be work properly.
-
-11. In Report Page, each and every reports should get download as both pdf and csv. the report is very important, before downloading add as view button to view the report. \
-
-12. Make the security page to be looking more good. 
-
-13. Remove the Database monitoring, System Configuration,catalogue buttons from the side panel.
-
-14. Role & Permission Management page, the buttons must work properly in the role cards.
-
-15. In Database backups page, the Trigger button, then the download and restore buttons to be built properly.
-
-16. Remove the System Health catalogue button also. from the catalogue button from side panel.
-
-17. Make the Profile page to be looking more good. 
-
-18. Make the settings page also looking more good.
-
-19. Make the complete project to be work properly, with proper and speed working website, then each and every pages in this super admin website to be built completely properly. 
-
-20. Not only the super admin in other roles website pages, the admin, manager, and customer also, each and every pages should be built properly and it should work properly and it should be lively.
-
-21. All the buttons in the website to be built completely properly. and each and every process or actions which the user do should be work properly.
-
-22. More Notifications were coming simply, the notification should come for only the important process or actions which the user do, and it should be in a good way, not like this spamming. and make the notification to be visible and good way.
-
-23. Make the template UI as, light theme with the, proper layout alignments.
-
-24. Remove the side panel space size between Bankio Title and Dashboard catalogue button. 
-
-25. Then add logout button in all the roles websites, at the side panel, at the bottom left corner as catalogue button in the side panel.
-
-The complete bankio project should work properly, all the project pages in all the roles with all the normal buttons and adding buttons and action buttons must work properly. Add all the setting customizations for the Super admin, admin, manager and for custome they only should get view, not needed to edit or update. This is complete important Project Built it carefully, All The details must stored in the Database completely and it should get display in the required pages properly in all roles pages also. This is complete banking System project all the details must work properly and frequently. This project should must work in all the devices responsive views, it should be suitable for all the responsive view in the devices. In Landing home page Add a header task bar at the top of the website, it should be must looking more good, Add some contents or runnig words about the banking system in the header task bar with proper bordered box. built it superbly. This website should be more speed, add the SEO optimization, Make the project to be live in the internet. built this project for live real project purpose, built it live real project properly. Add login details in the landing page and create option for users to login and get register for the bankio website. Everything msut work properly. built it carefully. 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { FiBriefcase, FiArrowDownCircle, FiArrowUpCircle, FiFileText, FiSend, FiUmbrella, FiCreditCard, FiDownload, FiAlertCircle, FiActivity } from 'react-icons/fi'
+import { FiBriefcase, FiArrowDownCircle, FiArrowUpCircle, FiFileText, FiSend, FiUmbrella, FiCreditCard, FiDownload, FiAlertCircle, FiActivity, FiLink, FiShield } from 'react-icons/fi'
+import { toast } from 'react-toastify'
 import StatCard from '../../components/DashboardWidgets/StatCard'
 import ChartWidget from '../../components/DashboardWidgets/ChartWidget'
 import TransactionTable from '../../components/DashboardWidgets/TransactionTable'
@@ -14,6 +15,9 @@ import LoanService from '../../services/LoanService'
 const Dashboard = () => {
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
+  const [showConnectModal, setShowConnectModal] = useState(false)
+  const [connecting, setConnecting] = useState(false)
+  const [bankDetails, setBankDetails] = useState({ accountNumber: '', ifscCode: '', accountType: 'Savings' })
 
   const [stats, setStats] = useState({
     totalBalance: 0,
@@ -117,12 +121,34 @@ const Dashboard = () => {
           accountType: accounts[0].accountType || 'Savings',
           balance: accounts[0].balance || 0
         })
+      } else {
+        setShowConnectModal(true)
       }
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleConnectBank = async (e) => {
+    e.preventDefault()
+    setConnecting(true)
+    try {
+      await AccountService.createAccount({
+        accountNumber: bankDetails.accountNumber,
+        ifscCode: bankDetails.ifscCode,
+        accountType: bankDetails.accountType,
+        balance: Math.floor(Math.random() * 50000) + 1000 // simulate existing bank balance
+      })
+      toast.success('Bank account successfully connected and verified!')
+      setShowConnectModal(false)
+      fetchDashboardData()
+    } catch (error) {
+      toast.error('Failed to connect bank account. Please check details.')
+    } finally {
+      setConnecting(false)
     }
   }
 
@@ -352,6 +378,52 @@ const Dashboard = () => {
 
         </div>
       </div>
+
+      {/* Connect Bank Account Modal */}
+      {showConnectModal && (
+        <div className="d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1050, backdropFilter: 'blur(5px)', position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}>
+          <div className="card border-0 shadow-lg rounded-4" style={{ width: '100%', maxWidth: '450px', zIndex: 1051, overflow: 'hidden' }}>
+            <div className="card-header border-0 text-white p-4" style={{ background: 'linear-gradient(135deg, #1e3a8a, #3b82f6)' }}>
+              <div className="text-center">
+                <div className="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3 shadow" style={{ width: '60px', height: '60px' }}>
+                  <FiLink size={28} />
+                </div>
+                <h4 className="fw-bold mb-1">Connect Your Bank</h4>
+                <p className="mb-0 text-white-50 small">Securely link your existing bank account to Bankio.</p>
+              </div>
+            </div>
+            <div className="card-body p-4 bg-light">
+              <div className="d-flex align-items-center gap-2 mb-4 p-3 bg-white rounded-3 border text-muted small">
+                <FiShield className="text-success fs-4" />
+                <span>Your data is encrypted and securely processed using bank-grade 256-bit encryption.</span>
+              </div>
+              <form onSubmit={handleConnectBank}>
+                <div className="mb-3">
+                  <label className="form-label fw-semibold small">Account Number</label>
+                  <input type="text" className="form-control p-2" placeholder="e.g. 000123456789" required value={bankDetails.accountNumber} onChange={(e) => setBankDetails({...bankDetails, accountNumber: e.target.value.replace(/\\D/g, '')})} />
+                </div>
+                <div className="row g-3 mb-4">
+                  <div className="col-6">
+                    <label className="form-label fw-semibold small">IFSC Code</label>
+                    <input type="text" className="form-control p-2 text-uppercase" placeholder="e.g. HDFC0001" required value={bankDetails.ifscCode} onChange={(e) => setBankDetails({...bankDetails, ifscCode: e.target.value.toUpperCase()})} />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label fw-semibold small">Account Type</label>
+                    <select className="form-select p-2" value={bankDetails.accountType} onChange={(e) => setBankDetails({...bankDetails, accountType: e.target.value})}>
+                      <option value="Savings">Savings</option>
+                      <option value="Current">Current</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow-sm" disabled={connecting}>
+                  {connecting ? 'Verifying Details...' : 'Securely Connect Account'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

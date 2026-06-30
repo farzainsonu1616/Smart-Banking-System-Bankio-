@@ -19,10 +19,10 @@ const Navbar = () => {
     <>
       <div className={`top-task-bar d-none d-lg-block ${scrolled ? 'd-none' : ''}`} style={{ background: 'var(--primary)', color: 'white', padding: '8px 0', fontSize: '13px', zIndex: 1000, position: 'fixed', width: '100%', top: 0, borderBottom: '1px solid rgba(255,255,255,0.2)' }}>
         <div className="container d-flex justify-content-between align-items-center">
-          <div style={{ overflow: 'hidden', whiteSpace: 'nowrap', width: '70%', border: '1px solid rgba(255,255,255,0.3)', padding: '2px 10px', borderRadius: '4px' }}>
-             <marquee scrollamount="5" className="fw-medium m-0">
-               🚀 Welcome to Bankio - The Next Generation Smart Banking System. Experience Zero-Fee International Transfers, High-Yield Savings, and 24/7 Security Monitoring. Join us today and secure your financial future! 🔒
-             </marquee>
+          <div className="d-flex align-items-center" style={{ overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '70%', padding: '2px 10px', borderRadius: '4px' }}>
+             <span className="fw-medium m-0" style={{ fontSize: '13px' }}>
+               🚀 Welcome to Bankio. Experience Zero-Fee International Transfers & High-Yield Savings! 🔒
+             </span>
           </div>
           <div className="d-flex gap-3 fw-bold">
              <span>📞 1-800-BANKIO</span>
@@ -39,39 +39,15 @@ const Navbar = () => {
           </button>
 
           <Link className="navbar-brand d-flex align-items-center gap-2 order-1 ms-auto order-lg-0 ms-lg-0" to="/">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="40" height="40" rx="10" fill="url(#paint0_linear)" fillOpacity="0.1"/>
-              <path d="M20 8L8 15V28C8 29.1046 8.89543 30 10 30H30C31.1046 30 32 29.1046 32 28V15L20 8Z" stroke="url(#paint0_linear)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16 22H24" stroke="url(#paint0_linear)" strokeWidth="2.5" strokeLinecap="round"/>
-              <path d="M20 18V26" stroke="url(#paint0_linear)" strokeWidth="2.5" strokeLinecap="round"/>
-              <circle cx="20" cy="18" r="2" fill="url(#paint0_linear)"/>
-              <defs>
-                <linearGradient id="paint0_linear" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#3B82F6"/>
-                  <stop offset="1" stopColor="#8B5CF6"/>
-                </linearGradient>
-              </defs>
-            </svg>
-            <span style={{ fontSize: '26px', fontWeight: '800', background: 'linear-gradient(45deg, #3B82F6, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '1px' }}>Bankio</span>
+            <img src="/assets/images/logo.png" alt="Bankio Logo" style={{ height: '45px', objectFit: 'contain', mixBlendMode: 'multiply' }} />
           </Link>
 
           <div className={`collapse navbar-collapse order-2 order-lg-1 ${mobileOpen ? 'show' : ''}`}>
             
             {/* Mobile Auth Buttons - Top of Menu */}
-            <div className="d-lg-none d-flex flex-column mb-3 pb-3 border-bottom" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-              {isAuthenticated ? (
-                <Link to={isAdmin ? '/admin' : '/dashboard'} className="cmn-btn d-flex align-items-center justify-content-center gap-2 w-100" onClick={() => setMobileOpen(false)}>
-                  <FiUser /> {user?.firstName || 'Dashboard'}
-                </Link>
-              ) : (
-                <div className="d-flex flex-column gap-2">
-                  <Link to="/login" className="cmn-btn second w-100 text-center" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} onClick={() => setMobileOpen(false)}>Sign In</Link>
-                  <Link to="/register" className="cmn-btn w-100 text-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
-                </div>
-              )}
-              <button onClick={toggleTheme} className="btn btn-outline-light mt-3 d-flex align-items-center justify-content-center gap-2">
-                {isDarkMode ? <><FiSun /> Light Mode</> : <><FiMoon /> Dark Mode</>}
-              </button>
+            <div className="d-lg-none d-flex flex-column mb-3 pb-3 border-bottom gap-2" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+              <Link to="/login" className="cmn-btn second w-100 text-center" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} onClick={() => setMobileOpen(false)}>Sign In</Link>
+              <Link to="/register" className="cmn-btn w-100 text-center" onClick={() => setMobileOpen(false)}>Sign Up</Link>
             </div>
             <ul className="navbar-nav mx-auto">
               <li className="nav-item"><NavLink className="nav-link" to="/">Home</NavLink></li>
@@ -82,19 +58,8 @@ const Navbar = () => {
             </ul>
 
             <div className="d-none d-lg-flex align-items-center gap-3 ms-auto profile-btn-desktop">
-              <button onClick={toggleTheme} className="btn text-white fs-5 border-0 bg-transparent p-0 me-2" style={{ color: scrolled ? 'var(--dark)' : 'var(--white)' }}>
-                {isDarkMode ? <FiSun color={scrolled ? '#333' : '#fff'} /> : <FiMoon color={scrolled ? '#333' : '#fff'} />}
-              </button>
-              {isAuthenticated ? (
-                <Link to={isAdmin ? '/admin' : '/dashboard'} className="cmn-btn d-flex align-items-center gap-2 shadow-sm hover-lift" style={{ borderRadius: '12px', padding: '10px 24px' }}>
-                  <FiUser /> {user?.firstName || 'Dashboard'}
-                </Link>
-              ) : (
-                <>
-                  <Link to="/login" className="cmn-btn second shadow-sm hover-lift me-2" style={{ borderRadius: '12px', padding: '10px 24px' }}>Sign In</Link>
-                  <Link to="/register" className="cmn-btn shadow-sm hover-lift" style={{ borderRadius: '12px', padding: '10px 24px' }}>Sign Up</Link>
-                </>
-              )}
+              <Link to="/login" className="cmn-btn second shadow-sm hover-lift me-2" style={{ borderRadius: '12px', padding: '10px 24px' }}>Sign In</Link>
+              <Link to="/register" className="cmn-btn shadow-sm hover-lift" style={{ borderRadius: '12px', padding: '10px 24px' }}>Sign Up</Link>
             </div>
           </div>
         </nav>

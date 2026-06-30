@@ -31,10 +31,10 @@ public class DataSeeder implements CommandLineRunner {
             customer = User.builder()
                     .fullName("Demo Customer")
                     .email("customer@bankio.com")
-                    .password(passwordEncoder.encode("Customer@123"))
                     .isEnabled(true)
                     .build();
         }
+        customer.setPassword(passwordEncoder.encode("Customer@123"));
         customer.setRoles(Set.of(customerRole));
         userRepository.save(customer);
 
@@ -43,10 +43,10 @@ public class DataSeeder implements CommandLineRunner {
             admin = User.builder()
                     .fullName("Admin User")
                     .email("admin@bankio.com")
-                    .password(passwordEncoder.encode("Admin@123"))
                     .isEnabled(true)
                     .build();
         }
+        admin.setPassword(passwordEncoder.encode("Admin@123"));
         admin.setRoles(Set.of(adminRole));
         userRepository.save(admin);
 
@@ -55,10 +55,10 @@ public class DataSeeder implements CommandLineRunner {
             manager = User.builder()
                     .fullName("Manager User")
                     .email("manager@bankio.com")
-                    .password(passwordEncoder.encode("Manager@123"))
                     .isEnabled(true)
                     .build();
         }
+        manager.setPassword(passwordEncoder.encode("Manager@123"));
         manager.setRoles(Set.of(managerRole));
         userRepository.save(manager);
 
@@ -67,10 +67,10 @@ public class DataSeeder implements CommandLineRunner {
             superAdmin = User.builder()
                     .fullName("Super Admin User")
                     .email("superadmin@bankio.com")
-                    .password(passwordEncoder.encode("SuperAdmin@123"))
                     .isEnabled(true)
                     .build();
         }
+        superAdmin.setPassword(passwordEncoder.encode("SuperAdmin@123"));
         superAdmin.setRoles(Set.of(superAdminRole));
         userRepository.save(superAdmin);
 

@@ -112,7 +112,7 @@ const ManageManagers = () => {
 
       {/* Custom Add Manager Modal */}
       {showAddModal && (
-        <div className="modal-backdrop fade show d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}>
+        <div className="d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1050, position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backdropFilter: 'blur(3px)' }}>
           <div className="card border-0 shadow-lg rounded-4" style={{ width: '100%', maxWidth: '400px' }}>
             <div className="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
               <h5 className="fw-bold mb-0">Add New Manager</h5>

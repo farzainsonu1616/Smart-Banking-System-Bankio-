@@ -9,7 +9,9 @@ const Footer = () => {
         <div className="row gy-4">
           <div className="col-lg-3 col-md-6">
             <div className="footer-widget">
-              <h5>Smart Banking</h5>
+              <Link to="/">
+                <img src="/assets/images/logo.png" alt="Bankio Logo" style={{ height: '45px', objectFit: 'contain', marginBottom: '20px' }} />
+              </Link>
               <p className="mb-3">Your trusted digital banking partner. Secure, modern, and reliable financial services.</p>
               <div className="social-link">
                 <a href="#"><FiFacebook /></a>
@@ -56,7 +58,7 @@ const Footer = () => {
         </div>
 
         <div className="footer-bottom mt-5">
-          <p className="mb-0">© {new Date().getFullYear()} Smart Banking System. All rights reserved.</p>
+          <p className="mb-0">© {new Date().getFullYear()} Bankio. All rights reserved.</p>
           <div className="d-flex gap-3">
             <Link to="/privacy-policy">Privacy Policy</Link>
             <Link to="/terms-conditions">Terms & Conditions</Link>

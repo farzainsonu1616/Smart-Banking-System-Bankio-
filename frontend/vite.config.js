@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://smart-banking-system-bankio-production.up.railway.app',
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false
       }
@@ -15,6 +15,23 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
+    cssCodeSplit: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          chart: ['chart.js', 'react-chartjs-2'],
+          icons: ['react-icons']
+        }
+      }
+    }
   }
 })

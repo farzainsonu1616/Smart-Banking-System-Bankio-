@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FiSearch, FiFilter, FiPlus, FiEdit2, FiTrash2, FiShield, FiX } from 'react-icons/fi'
+import { FiSearch, FiFilter, FiPlus, FiEdit2, FiTrash2, FiShield, FiX, FiEye, FiCheckCircle, FiSlash, FiUser } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 
 const initialAdmins = [
@@ -11,8 +11,15 @@ const ManageAdmins = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRole, setFilterRole] = useState('All')
   const [admins, setAdmins] = useState(initialAdmins)
+  
+  // Modal States
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showViewModal, setShowViewModal] = useState(false)
+  
+  // Data States
   const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'System Admin' })
+  const [selectedAdmin, setSelectedAdmin] = useState(null)
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this admin?')) {
@@ -21,8 +28,26 @@ const ManageAdmins = () => {
     }
   }
 
-  const handleEdit = () => {
-    toast.info('Edit Admin modal opened')
+  const handleStatusChange = (id, newStatus) => {
+    setAdmins(admins.map(a => a.id === id ? { ...a, status: newStatus } : a))
+    toast.success(`Admin status updated to ${newStatus}`)
+  }
+
+  const handleView = (admin) => {
+    setSelectedAdmin(admin)
+    setShowViewModal(true)
+  }
+
+  const handleEditClick = (admin) => {
+    setSelectedAdmin(admin)
+    setShowEditModal(true)
+  }
+
+  const handleEditSubmit = (e) => {
+    e.preventDefault()
+    setAdmins(admins.map(a => a.id === selectedAdmin.id ? selectedAdmin : a))
+    setShowEditModal(false)
+    toast.success('Admin details updated successfully')
   }
 
   const handleAddSubmit = (e) => {
@@ -51,6 +76,10 @@ const ManageAdmins = () => {
     const matchesFilter = filterRole === 'All' || admin.role === filterRole
     return matchesSearch && matchesFilter
   })
+
+  // Reusable Overlay Style to prevent text bleeding from background
+  const overlayStyle = { backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999, position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backdropFilter: 'blur(3px)' }
+  const cardStyle = { width: '100%', maxWidth: '450px', position: 'relative', zIndex: 10000, backgroundColor: '#ffffff' }
 
   return (
     <div className="container-fluid py-4">
@@ -109,8 +138,11 @@ const ManageAdmins = () => {
                     </td>
                     <td className="py-3 border-end-0 border-start-0 text-muted"><small>{admin.login}</small></td>
                     <td className="text-end px-4 py-3 border-start-0">
-                      <div className="d-flex justify-content-end gap-2">
-                        <button onClick={handleEdit} className="btn btn-sm btn-light text-dark" title="Edit"><FiEdit2 /></button>
+                      <div className="d-flex justify-content-end gap-1">
+                        <button onClick={() => handleView(admin)} className="btn btn-sm btn-light text-primary" title="View Details"><FiEye /></button>
+                        <button onClick={() => handleStatusChange(admin.id, 'Active')} className="btn btn-sm btn-light text-success" title="Approve/Activate"><FiCheckCircle /></button>
+                        <button onClick={() => handleStatusChange(admin.id, 'Blocked')} className="btn btn-sm btn-light text-warning" title="Block/Suspend"><FiSlash /></button>
+                        <button onClick={() => handleEditClick(admin)} className="btn btn-sm btn-light text-dark" title="Edit"><FiEdit2 /></button>
                         <button onClick={() => handleDelete(admin.id)} className="btn btn-sm btn-light text-danger" title="Delete"><FiTrash2 /></button>
                       </div>
                     </td>
@@ -124,10 +156,10 @@ const ManageAdmins = () => {
         </div>
       </div>
 
-      {/* Custom Add Admin Modal */}
+      {/* Add Admin Modal */}
       {showAddModal && (
-        <div className="modal-backdrop fade show d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}>
-          <div className="card border-0 shadow-lg rounded-4" style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="d-flex align-items-center justify-content-center" style={overlayStyle}>
+          <div className="card border-0 shadow-lg rounded-4" style={cardStyle}>
             <div className="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
               <h5 className="fw-bold mb-0">Add New Admin</h5>
               <button className="btn btn-link text-dark p-0 border-0" onClick={() => setShowAddModal(false)}><FiX size={24}/></button>
@@ -136,21 +168,94 @@ const ManageAdmins = () => {
               <form onSubmit={handleAddSubmit}>
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Full Name</label>
-                  <input type="text" className="form-control" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} required />
+                  <input type="text" className="form-control form-control-lg" placeholder="e.g. Michael Scott" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} required />
                 </div>
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Email Address</label>
-                  <input type="email" className="form-control" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} required />
+                  <input type="email" className="form-control form-control-lg" placeholder="michael@bankio.com" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} required />
                 </div>
                 <div className="mb-4">
                   <label className="form-label fw-semibold">Role</label>
-                  <select className="form-select" value={newAdmin.role} onChange={e => setNewAdmin({...newAdmin, role: e.target.value})}>
+                  <select className="form-select form-select-lg" value={newAdmin.role} onChange={e => setNewAdmin({...newAdmin, role: e.target.value})}>
                     <option value="System Admin">System Admin</option>
                     <option value="Audit Admin">Audit Admin</option>
                   </select>
                 </div>
-                <button type="submit" className="btn btn-primary w-100">Create Admin</button>
+                <button type="submit" className="btn btn-primary btn-lg w-100">Create Admin</button>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Admin Modal */}
+      {showEditModal && selectedAdmin && (
+        <div className="d-flex align-items-center justify-content-center" style={overlayStyle}>
+          <div className="card border-0 shadow-lg rounded-4" style={cardStyle}>
+            <div className="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+              <h5 className="fw-bold mb-0">Edit Admin</h5>
+              <button className="btn btn-link text-dark p-0 border-0" onClick={() => setShowEditModal(false)}><FiX size={24}/></button>
+            </div>
+            <div className="card-body p-4">
+              <form onSubmit={handleEditSubmit}>
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Full Name</label>
+                  <input type="text" className="form-control form-control-lg" value={selectedAdmin.name} onChange={e => setSelectedAdmin({...selectedAdmin, name: e.target.value})} required />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Email Address</label>
+                  <input type="email" className="form-control form-control-lg" value={selectedAdmin.email} onChange={e => setSelectedAdmin({...selectedAdmin, email: e.target.value})} required />
+                </div>
+                <div className="mb-4">
+                  <label className="form-label fw-semibold">Role</label>
+                  <select className="form-select form-select-lg" value={selectedAdmin.role} onChange={e => setSelectedAdmin({...selectedAdmin, role: e.target.value})}>
+                    <option value="System Admin">System Admin</option>
+                    <option value="Audit Admin">Audit Admin</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary btn-lg w-100">Save Changes</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Admin Modal */}
+      {showViewModal && selectedAdmin && (
+        <div className="d-flex align-items-center justify-content-center" style={overlayStyle}>
+          <div className="card border-0 shadow-lg rounded-4" style={cardStyle}>
+            <div className="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+              <h5 className="fw-bold mb-0">Admin Details</h5>
+              <button className="btn btn-link text-dark p-0 border-0" onClick={() => setShowViewModal(false)}><FiX size={24}/></button>
+            </div>
+            <div className="card-body p-4 text-center">
+              <div className={`bg-${selectedAdmin.color} text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow`} style={{width: '80px', height: '80px', fontSize: '24px'}}>
+                <strong>{selectedAdmin.initials}</strong>
+              </div>
+              <h4 className="fw-bold text-dark mb-1">{selectedAdmin.name}</h4>
+              <p className="text-muted mb-3">{selectedAdmin.email}</p>
+              
+              <div className="d-flex justify-content-center gap-3 mb-4">
+                <span className={`badge bg-${selectedAdmin.color}-subtle text-${selectedAdmin.color} px-3 py-2`}><FiShield className="me-1"/> {selectedAdmin.role}</span>
+                <span className={`badge ${selectedAdmin.status === 'Active' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'} px-3 py-2`}>
+                  {selectedAdmin.status}
+                </span>
+              </div>
+              
+              <div className="bg-light rounded-3 p-3 text-start">
+                <div className="d-flex justify-content-between border-bottom pb-2 mb-2">
+                  <span className="text-muted fw-semibold">Admin ID</span>
+                  <span className="fw-bold text-dark">{selectedAdmin.id}</span>
+                </div>
+                <div className="d-flex justify-content-between border-bottom pb-2 mb-2">
+                  <span className="text-muted fw-semibold">Last Login</span>
+                  <span className="fw-bold text-dark">{selectedAdmin.login}</span>
+                </div>
+                <div className="d-flex justify-content-between">
+                  <span className="text-muted fw-semibold">Permissions</span>
+                  <span className="fw-bold text-dark">Full Access</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

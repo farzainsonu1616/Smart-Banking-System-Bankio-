@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FiSearch, FiPlus, FiMapPin, FiUsers, FiDollarSign, FiX } from 'react-icons/fi'
+import { FiSearch, FiPlus, FiMapPin, FiUsers, FiDollarSign, FiX, FiActivity, FiTrendingUp, FiCreditCard } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 
 const initialBranches = [
@@ -13,6 +13,8 @@ const ManageBranches = () => {
   const [filterStatus, setFilterStatus] = useState('All')
   const [branches, setBranches] = useState(initialBranches)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false)
+  const [selectedBranch, setSelectedBranch] = useState(null)
   const [newBranch, setNewBranch] = useState({ name: '', location: '' })
 
   const handleAddSubmit = (e) => {
@@ -34,8 +36,9 @@ const ManageBranches = () => {
     toast.success('New Branch registered successfully')
   }
 
-  const handleViewDetails = (branchName) => {
-    toast.info(`Opening analytics for ${branchName}`)
+  const handleViewDetails = (branch) => {
+    setSelectedBranch(branch)
+    setShowAnalyticsModal(true)
   }
 
   const filteredBranches = branches.filter(branch => {
@@ -43,6 +46,8 @@ const ManageBranches = () => {
     const matchesFilter = filterStatus === 'All' || branch.status === filterStatus
     return matchesSearch && matchesFilter
   })
+
+  const overlayStyle = { backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 9999, position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backdropFilter: 'blur(3px)' }
 
   return (
     <div className="container-fluid py-4">
@@ -106,7 +111,7 @@ const ManageBranches = () => {
                 </div>
 
                 <div className="d-grid gap-2">
-                  <button onClick={() => handleViewDetails(branch.name)} className="btn btn-outline-primary rounded-4 fw-bold py-2">View Details & Analytics</button>
+                  <button onClick={() => handleViewDetails(branch)} className="btn btn-outline-primary rounded-4 fw-bold py-2">View Details & Analytics</button>
                 </div>
               </div>
             </div>
@@ -118,10 +123,10 @@ const ManageBranches = () => {
         )}
       </div>
 
-      {/* Custom Register Branch Modal */}
+      {/* Register Branch Modal */}
       {showAddModal && (
-        <div className="modal-backdrop fade show d-flex align-items-center justify-content-center" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}>
-          <div className="card border-0 shadow-lg rounded-4" style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="d-flex align-items-center justify-content-center" style={overlayStyle}>
+          <div className="card border-0 shadow-lg rounded-4" style={{ width: '100%', maxWidth: '400px', position: 'relative', zIndex: 10000, backgroundColor: '#ffffff' }}>
             <div className="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
               <h5 className="fw-bold mb-0">Register New Branch</h5>
               <button className="btn btn-link text-dark p-0 border-0" onClick={() => setShowAddModal(false)}><FiX size={24}/></button>
@@ -130,14 +135,76 @@ const ManageBranches = () => {
               <form onSubmit={handleAddSubmit}>
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Branch Name</label>
-                  <input type="text" className="form-control" value={newBranch.name} onChange={e => setNewBranch({...newBranch, name: e.target.value})} required />
+                  <input type="text" className="form-control" placeholder="e.g. Southside Hub" value={newBranch.name} onChange={e => setNewBranch({...newBranch, name: e.target.value})} required />
                 </div>
                 <div className="mb-4">
                   <label className="form-label fw-semibold">Location / Address</label>
-                  <input type="text" className="form-control" value={newBranch.location} onChange={e => setNewBranch({...newBranch, location: e.target.value})} required />
+                  <input type="text" className="form-control" placeholder="e.g. 123 Main St, NY" value={newBranch.location} onChange={e => setNewBranch({...newBranch, location: e.target.value})} required />
                 </div>
                 <button type="submit" className="btn btn-primary w-100">Register Branch</button>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Branch Analytics Modal */}
+      {showAnalyticsModal && selectedBranch && (
+        <div className="d-flex align-items-center justify-content-center" style={overlayStyle}>
+          <div className="card border-0 shadow-lg rounded-4" style={{ width: '100%', maxWidth: '800px', position: 'relative', zIndex: 10000, backgroundColor: '#ffffff', overflow: 'hidden' }}>
+            <div className="card-header border-0 text-white" style={{ background: 'linear-gradient(135deg, #1e3a8a, #3b82f6)', padding: '24px' }}>
+              <div className="d-flex justify-content-between align-items-start">
+                <div>
+                  <h4 className="fw-bold mb-1 text-white">{selectedBranch.name}</h4>
+                  <p className="mb-0 text-white-50"><FiMapPin className="me-1"/> {selectedBranch.location} &bull; {selectedBranch.code}</p>
+                </div>
+                <button className="btn btn-link text-white p-0 border-0" onClick={() => setShowAnalyticsModal(false)}><FiX size={28}/></button>
+              </div>
+            </div>
+            
+            <div className="card-body p-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              <div className="row g-4 mb-4">
+                <div className="col-md-4">
+                  <div className="bg-light p-3 rounded-4 border">
+                    <div className="text-primary mb-2"><FiUsers size={24}/></div>
+                    <small className="text-muted fw-bold d-block">Total Customers</small>
+                    <h3 className="fw-bolder mb-0 text-dark">{selectedBranch.customers}</h3>
+                    <small className="text-success fw-bold"><FiTrendingUp/> +12% this month</small>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="bg-light p-3 rounded-4 border">
+                    <div className="text-success mb-2"><FiDollarSign size={24}/></div>
+                    <small className="text-muted fw-bold d-block">Monthly Revenue</small>
+                    <h3 className="fw-bolder mb-0 text-dark">{selectedBranch.revenue}</h3>
+                    <small className="text-success fw-bold"><FiTrendingUp/> +5.4% this month</small>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="bg-light p-3 rounded-4 border">
+                    <div className="text-warning mb-2"><FiActivity size={24}/></div>
+                    <small className="text-muted fw-bold d-block">Active Loans</small>
+                    <h3 className="fw-bolder mb-0 text-dark">452</h3>
+                    <small className="text-muted fw-bold">Active portfolios</small>
+                  </div>
+                </div>
+              </div>
+
+              <h6 className="fw-bold text-dark mb-3">Recent Transactions Analytics</h6>
+              <div className="bg-light rounded-4 border p-4 mb-4 d-flex align-items-center justify-content-center" style={{ height: '200px' }}>
+                <div className="text-center text-muted">
+                  <FiActivity size={40} className="mb-2 opacity-50"/>
+                  <p className="mb-0">Analytics chart rendering...</p>
+                  <small>Real-time graph connecting to branch data feed</small>
+                </div>
+              </div>
+
+              <div className="d-flex justify-content-between align-items-center">
+                <span className={`badge px-3 py-2 ${selectedBranch.status === 'Operational' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}`}>
+                  Status: {selectedBranch.status}
+                </span>
+                <button className="btn btn-outline-primary rounded-pill px-4" onClick={() => setShowAnalyticsModal(false)}>Close Analytics</button>
+              </div>
             </div>
           </div>
         </div>

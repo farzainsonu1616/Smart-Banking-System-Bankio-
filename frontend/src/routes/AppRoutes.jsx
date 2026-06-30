@@ -75,9 +75,8 @@ import SuperAdminSettings from '../pages/SuperAdmin/SuperAdminSettings'
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-
-      <Route element={<PrivateRoute><MainLayout /></PrivateRoute>}>
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/faqs" element={<FAQ />} />

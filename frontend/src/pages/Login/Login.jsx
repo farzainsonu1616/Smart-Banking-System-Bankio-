@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { FiArrowLeft } from 'react-icons/fi'
+import { FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi'
 import AuthService from '../../services/AuthService'
 import { useAuth } from '../../context/AuthContext'
 
@@ -10,6 +10,7 @@ const Login = () => {
   const { login } = useAuth()
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -28,19 +29,17 @@ const Login = () => {
       toast.success('Login successful!')
       
       // Navigate using React Router instead of window.location for SPA behavior
-      setTimeout(() => {
-        if (user.roles && user.roles.includes('ROLE_CUSTOMER')) {
-            navigate('/customer/dashboard')
-        } else if (user.roles && user.roles.includes('ROLE_ADMIN')) {
-            navigate('/admin/dashboard')
-        } else if (user.roles && user.roles.includes('ROLE_MANAGER')) {
-            navigate('/manager/dashboard')
-        } else if (user.roles && user.roles.includes('ROLE_SUPER_ADMIN')) {
-            navigate('/super-admin/dashboard')
-        } else {
-            navigate('/')
-        }
-      }, 500)
+      if (user.roles && user.roles.includes('ROLE_CUSTOMER')) {
+          navigate('/customer/dashboard')
+      } else if (user.roles && user.roles.includes('ROLE_ADMIN')) {
+          navigate('/admin/dashboard')
+      } else if (user.roles && user.roles.includes('ROLE_MANAGER')) {
+          navigate('/manager/dashboard')
+      } else if (user.roles && user.roles.includes('ROLE_SUPER_ADMIN')) {
+          navigate('/super-admin/dashboard')
+      } else {
+          navigate('/')
+      }
       
     } catch (error) {
       const errorMessage = error.response?.data?.message;
@@ -69,23 +68,10 @@ const Login = () => {
                 </Link>
               </div>
               <Link to="/" className="mb-4 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
-                <svg width="50" height="50" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="40" height="40" rx="10" fill="url(#paint0_linear_auth)" fillOpacity="0.15"/>
-                  <path d="M20 8L8 15V28C8 29.1046 8.89543 30 10 30H30C31.1046 30 32 29.1046 32 28V15L20 8Z" stroke="url(#paint0_linear_auth)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M16 22H24" stroke="url(#paint0_linear_auth)" strokeWidth="2.5" strokeLinecap="round"/>
-                  <path d="M20 18V26" stroke="url(#paint0_linear_auth)" strokeWidth="2.5" strokeLinecap="round"/>
-                  <circle cx="20" cy="18" r="2" fill="url(#paint0_linear_auth)"/>
-                  <defs>
-                    <linearGradient id="paint0_linear_auth" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="#60A5FA"/>
-                      <stop offset="1" stopColor="#A78BFA"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <span style={{ fontSize: '36px', fontWeight: '800', background: 'linear-gradient(45deg, #60A5FA, #A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '1.5px' }}>Bankio</span>
+                <img src="/assets/images/logo.png" alt="Bankio Logo" style={{ height: '50px', objectFit: 'contain', mixBlendMode: 'multiply' }} />
               </Link>
               <h3 className="mb-2">Welcome Back!</h3>
-              <p className="text-muted mb-4">Sign in to your Smart Banking account</p>
+              <p className="text-muted mb-4">Sign in to your Bankio account</p>
               
               <form onSubmit={handleSubmit} className="text-start">
                 <div className="single-input">
@@ -105,15 +91,26 @@ const Login = () => {
                     <label htmlFor="password">Password</label>
                     <Link to="/forgot-password" className="text-primary small fw-semibold">Forgot Password?</Link>
                   </div>
-                  <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    placeholder="Enter your password" 
-                    required 
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
+                  <div className="position-relative">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      id="password" 
+                      name="password" 
+                      placeholder="Enter your password" 
+                      required 
+                      value={formData.password}
+                      onChange={handleChange}
+                      style={{ paddingRight: '45px' }}
+                    />
+                    <button 
+                      type="button" 
+                      className="btn border-0 p-0 position-absolute end-0 top-50 translate-middle-y me-3"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{ background: 'transparent', zIndex: 10 }}
+                    >
+                      {showPassword ? <FiEyeOff size={18} className="text-muted" /> : <FiEye size={18} className="text-muted" />}
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" className="cmn-btn w-100 mt-3" disabled={loading}>
                   {loading ? 'Signing In...' : 'Sign In'}

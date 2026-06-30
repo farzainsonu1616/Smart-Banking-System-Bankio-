@@ -46,26 +46,29 @@ const ManagerDashboard = () => {
       </div>
       
       <div className="row gy-4 mb-4">
-        <div className="col-xl-2 col-md-4 col-sm-6">
+        <div className="col-xl-3 col-md-6">
           <StatCard icon={<FiBriefcase />} title="Branch Accounts" value={branchStats.totalAccounts} color="primary" />
         </div>
-        <div className="col-xl-2 col-md-4 col-sm-6">
+        <div className="col-xl-3 col-md-6">
           <StatCard icon={<FiUsers />} title="Branch Customers" value={branchStats.totalCustomers} color="info" />
         </div>
-        <div className="col-xl-2 col-md-4 col-sm-6">
+        <div className="col-xl-3 col-md-6">
           <StatCard icon={<FiFileText />} title="Loan Approvals" value={branchStats.loanApprovals} color="success" />
         </div>
-        <div className="col-xl-2 col-md-4 col-sm-6">
+        <div className="col-xl-3 col-md-6">
           <StatCard icon={<FiTrendingUp />} title="Branch Revenue" value={formatCurrency(branchStats.branchRevenue)} color="warning" />
         </div>
-        <div className="col-xl-4 col-md-8 col-sm-12">
-          <div className="card border-0 h-100" style={{ background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', color: 'white', borderRadius: '16px' }}>
+      </div>
+
+      <div className="row mb-4">
+        <div className="col-12">
+          <div className="card border-0 h-100 shadow-sm" style={{ background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', color: 'white', borderRadius: '16px' }}>
             <div className="card-body p-4 d-flex flex-column justify-content-center">
-              <h5 className="mb-3 opacity-75">Branch Performance Goal</h5>
-              <div className="progress mb-2" style={{ height: '10px', background: 'rgba(255,255,255,0.2)' }}>
-                <div className="progress-bar bg-white" role="progressbar" style={{ width: '78%' }} aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+              <h5 className="mb-3 opacity-75 fw-bold">Branch Performance Goal</h5>
+              <div className="progress mb-3" style={{ height: '12px', background: 'rgba(255,255,255,0.2)' }}>
+                <div className="progress-bar bg-white progress-bar-striped progress-bar-animated" role="progressbar" style={{ width: '78%' }} aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-              <p className="mb-0"><strong>78%</strong> of Q3 Revenue Target achieved</p>
+              <p className="mb-0 fs-6"><strong>78%</strong> of Q3 Revenue Target achieved</p>
             </div>
           </div>
         </div>
